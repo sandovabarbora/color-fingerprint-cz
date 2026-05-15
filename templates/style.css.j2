@@ -1,0 +1,159 @@
+/* All styling is inlined into report.html.j2 — system fonts, no JS, no assets. */
+
+:root {
+    --bg: #FAFAF7;
+    --ink: #181818;
+    --ink-soft: #555;
+    --rule: #DCD8D0;
+    --accent: #181818;
+    --strip-h: 64px;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+        "Helvetica Neue", Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+}
+
+main {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+}
+
+header h1 {
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin: 0 0 6px 0;
+}
+
+header .lede {
+    margin: 0 0 4px 0;
+    color: var(--ink-soft);
+    font-size: 16px;
+}
+
+header .byline {
+    margin: 0 0 40px 0;
+    color: var(--ink-soft);
+    font-size: 13px;
+}
+
+header .byline a {
+    color: var(--ink-soft);
+    text-decoration: underline;
+    text-decoration-color: var(--rule);
+    text-underline-offset: 2px;
+}
+
+.method {
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    padding: 16px 0;
+    margin: 0 0 40px;
+    color: var(--ink-soft);
+    font-size: 13px;
+}
+
+.method strong {
+    color: var(--ink);
+    font-weight: 600;
+}
+
+h2 {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin: 48px 0 16px;
+    color: var(--ink-soft);
+}
+
+.brand-row {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: 24px;
+    align-items: center;
+    margin-bottom: 18px;
+}
+
+.brand-meta .name {
+    font-weight: 600;
+    font-size: 15px;
+    margin: 0;
+}
+
+.brand-meta .sector {
+    font-size: 12px;
+    color: var(--ink-soft);
+    margin: 2px 0 0;
+}
+
+.brand-meta .swatch {
+    display: inline-block;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    vertical-align: middle;
+    margin-right: 6px;
+    border: 1px solid var(--rule);
+}
+
+.strip {
+    display: block;
+    width: 100%;
+    height: var(--strip-h);
+}
+
+.scatter {
+    display: block;
+    width: 100%;
+    max-width: 540px;
+    margin: 8px auto 0;
+}
+
+.insight {
+    border-left: 2px solid var(--ink);
+    padding: 4px 0 4px 16px;
+    margin: 0 0 20px;
+    max-width: 720px;
+}
+
+.insight .obs {
+    font-weight: 600;
+    margin: 0 0 4px;
+    font-size: 15px;
+}
+
+.insight .interp {
+    margin: 0;
+    color: var(--ink-soft);
+    font-size: 14px;
+}
+
+footer {
+    margin-top: 64px;
+    padding-top: 20px;
+    border-top: 1px solid var(--rule);
+    color: var(--ink-soft);
+    font-size: 12px;
+}
+
+footer p {
+    margin: 0 0 6px;
+}
+
+footer a {
+    color: var(--ink-soft);
+}

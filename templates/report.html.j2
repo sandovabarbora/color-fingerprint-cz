@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Color Fingerprint of Czech Advertising</title>
+<style>{{ inline_css }}</style>
+</head>
+<body>
+<main>
+
+<header>
+    <h1>Color Fingerprint of Czech Advertising</h1>
+    <p class="lede">Ten publicly available spots, sampled at one frame per second, clustered in CIE-LAB.</p>
+    <p class="byline">{{ author }} · <a href="{{ repo_url }}">source on GitHub</a></p>
+</header>
+
+<section class="method">
+<strong>Method</strong> — frames sampled at 1 fps from public YouTube uploads. Per-frame palettes via K-means (k = 5) in canonical CIE-LAB color space, where Euclidean distance approximates perceptual difference. Brand-level metrics aggregate across all retained frames of each spot.
+</section>
+
+<section>
+<h2>Per-brand color strips</h2>
+{% for row in brand_rows %}
+<div class="brand-row">
+    <div class="brand-meta">
+        <p class="name">
+            <span class="swatch" style="background: {{ row.anchor_hex }};"></span>{{ row.brand }}
+        </p>
+        <p class="sector">{{ row.sector }} · {{ row.n_frames }} frames</p>
+    </div>
+    {{ row.strip_html | safe }}
+</div>
+{% endfor %}
+</section>
+
+<section>
+<h2>Cross-brand: palette diversity × saturation tension</h2>
+{{ scatter_svg | safe }}
+</section>
+
+<section>
+<h2>Observations</h2>
+{% for ins in insights %}
+<div class="insight">
+    <p class="obs">{{ ins.obs }}</p>
+    <p class="interp">{{ ins.interp }}</p>
+</div>
+{% endfor %}
+</section>
+
+<footer>
+<p>Analysis of publicly available video material. Brands and campaigns are referenced for analytical purposes only. No agency attribution is implied.</p>
+<p>Code MIT · derived data CC-BY-4.0 · source video material is not redistributed.</p>
+</footer>
+
+</main>
+</body>
+</html>
