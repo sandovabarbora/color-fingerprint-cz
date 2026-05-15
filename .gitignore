@@ -1,0 +1,36 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+.pytest_cache/
+.ruff_cache/
+
+# Virtual environments
+.venv/
+
+# Raw video data — must never be committed (size, license, redistribution)
+data/raw/
+data/frames/
+*.mp4
+*.webm
+*.mkv
+*.m4a
+
+# Sanity-check figures are local-only QA artifacts, not part of the report
+outputs/figures/
+
+# Derived data is small enough to commit, but keep working files local
+pipeline.log
+*.log
+
+# Notebooks: keep .ipynb files, ignore checkpoints
+.ipynb_checkpoints/
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+*.swp
