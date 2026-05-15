@@ -54,11 +54,12 @@ make test             # pytest
 
 ## Methodology
 
-1. **Fetch.** A curated list of 10 publicly available Czech spots
-   (`config/corpus.yaml`, six sectors) is resolved against YouTube via
-   `yt-dlp`. Channel-scoped search is used when a channel URL is provided,
-   global `ytsearch1:` otherwise. Spots are filtered to 15–180s duration
-   and view-count > 10k to bias toward actual TV creative.
+1. **Fetch.** Brand definitions live in `config/brands.yaml` (one row per
+   brand, with a YouTube channel and an anchor hex). The discovery script
+   `scripts/discover_spots.py` walks each brand's channel and writes the
+   discovered spots to `config/corpus.yaml`, currently 47 spots across
+   13 brands (six sectors). Spots are filtered to 15–180s duration and
+   view-count > 10k. The pipeline reads from `corpus.yaml`.
 
 2. **Extract.** Each spot is sampled at 1 fps via `ffmpeg-python`, with the
    first and last 0.5s dropped (logo intros/outros otherwise dominate
@@ -80,10 +81,11 @@ make test             # pytest
      within ±15° of the brand's anchor color (circular hue distance).
 
 5. **Render.** A single static HTML page with inline CSS, no JavaScript.
-   Per-brand color strips are base64-inlined PNGs (PIL); the scatter,
-   hue radials, sector CI plot and dendrogram are inline SVG. Bodoni
-   Moda and Manrope are loaded from Google Fonts. Page weight ~110 KB
-   (the original brief targeted 80 KB; the added analyses earn the
+   Strips and radials aggregate frames across all spots of a brand
+   (so 47 spots fit into 13 readable rows); the gap bar chart shows
+   every spot separately. Bodoni Moda and Manrope are loaded from
+   Google Fonts. Page weight ~220 KB (the original brief targeted 80 KB
+   on a 10-spot corpus; the larger corpus + added analyses earn the
    extra weight).
 
 ---
@@ -101,9 +103,10 @@ Every choice trades one fidelity for another. The honest list:
 - **Brand anchor colors are hand-curated.** A brand's "true" color is
   often a system, not a single hex. We picked one canonical hex per brand
   and accept that anchor-share numbers shift if the anchor moves.
-- **n = 1 spot per brand (mostly).** Cross-brand contrast is real; intra-
-  brand variation is unmeasured except for McDonald's, which contributes
-  two spots specifically to make that variation visible.
+- **n averages ~4 spots per brand.** Discovery picks the most recent
+  qualifying videos from each brand's channel, so a brand's recent
+  promo cycle dominates over its image / Vánoční work. Within-brand
+  variation is now visible; between-brand is robust.
 - **K = 5 is a choice, not a discovery.** Higher k surfaces more accent
   colors but dilutes the palette story. We didn't sweep k.
 - **YouTube ≠ broadcast.** Compression and upload pipelines shift color.

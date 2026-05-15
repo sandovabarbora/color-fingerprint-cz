@@ -1,0 +1,96 @@
+# Curated corpus of Czech advertising spots for color-fingerprint analysis.
+#
+# Schema (per entry):
+#   id            unique kebab-case identifier (used as filename stem)
+#   brand         display name (may repeat across rows; e.g. two McDonald's spots)
+#   sector        one of: QSR, Retail, Beverage, Automotive, Banking, Telecom
+#   channel_url   YouTube channel to search inside; null = open YouTube search
+#   search_query  passed to yt-dlp's `ytsearch1:` resolver (or channel search)
+#   expected_year hint for human verification; not used as a filter
+#   anchor_hex    brand color anchor for the brand_anchor metric (LAB-distance basis)
+#
+# Runtime filters (applied in src/fetch.py, not declared here):
+#   - duration between 15 and 90 seconds
+#   - view_count > 10_000 (proxy for actual campaign vs leaked draft)
+#   - public + downloadable (yt-dlp will skip and log WARNING otherwise)
+
+brands:
+  - id: mcdonalds_syrova
+    brand: McDonald's
+    sector: QSR
+    channel_url: https://www.youtube.com/@mcdonaldsczech
+    search_query: Sýrová sezóna
+    expected_year: 2024
+    anchor_hex: "#FFC72C"  # golden yellow
+
+  - id: mcdonalds_mcnroll
+    brand: McDonald's
+    sector: QSR
+    channel_url: https://www.youtube.com/@mcdonaldsczech
+    search_query: Mc'n'Roll Forejt
+    expected_year: 2022
+    anchor_hex: "#FFC72C"
+
+  - id: penny_vanocni
+    brand: Penny Market
+    sector: Retail
+    channel_url: null
+    search_query: Penny Market vánoční reklama 2023
+    expected_year: 2023
+    anchor_hex: "#E30613"  # red
+
+  - id: kofola_menevice
+    brand: Kofola
+    sector: Beverage
+    channel_url: null
+    search_query: Kofola MéněVíce reklama 2022
+    expected_year: 2022
+    anchor_hex: "#8B4513"  # cola brown
+
+  - id: pilsner_vanocni
+    brand: Pilsner Urquell
+    sector: Beverage
+    channel_url: null
+    search_query: Pilsner Urquell vánoční spot
+    expected_year: 2022
+    anchor_hex: "#00713C"  # green
+
+  - id: mattoni_image
+    brand: Mattoni
+    sector: Beverage
+    channel_url: null
+    search_query: Mattoni reklama voda
+    expected_year: 2023
+    anchor_hex: "#0072CE"  # blue
+
+  - id: aaa_auto_tvspot
+    brand: AAA Auto
+    sector: Automotive
+    channel_url: null
+    search_query: AAA Auto reklama
+    expected_year: 2024
+    anchor_hex: "#FFD500"  # yellow
+
+  - id: fio_banka_tvspot
+    brand: Fio banka
+    sector: Banking
+    channel_url: null
+    search_query: Fio banka reklama 2023
+    expected_year: 2023
+    anchor_hex: "#00A551"  # green
+
+  - id: tmobile_image
+    brand: T-Mobile
+    sector: Telecom
+    channel_url: null
+    search_query: T-Mobile vánoční reklama
+    expected_year: 2023
+    anchor_hex: "#E20074"  # magenta
+
+  - id: vodafone_vanocni
+    brand: Vodafone
+    sector: Telecom
+    channel_url: null
+    search_query: Vodafone vánoční reklama
+    expected_year: 2024
+    anchor_hex: "#E60000"  # red

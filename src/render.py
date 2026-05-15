@@ -36,6 +36,7 @@ from scipy.spatial.distance import squareform
 
 from src import config
 from src import metrics as metrics_mod
+from src.fetch import brand_kebab_id, load_corpus
 
 logger = logging.getLogger(__name__)
 
@@ -282,19 +283,34 @@ def build_scatter_svg(
 # --- Brand-color gap horizontal bars --------------------------------------
 
 
-def build_gap_svg(campaigns: pd.DataFrame, width: int = 720, row_h: int = 22) -> str:
+def build_gap_svg(campaigns: pd.DataFrame, width: int = 720, row_h: int | None = None) -> str:
     """Horizontal bar chart of brand-color gap (degrees), sorted ascending.
 
     Each bar is filled with the brand's anchor color so the reader can
     see what swatch is "missing" from the picture. A reference tick at
     90° marks the threshold beyond which the on-screen color is essentially
     a different color from the brand color.
+
+    Adapts row height to the number of bars so a 13-row chart stays
+    readable and a 47-row chart stays page-friendly.
     """
     df = campaigns.dropna(subset=["color_gap_deg"]).copy()
     if df.empty:
         return ""
     df = df.sort_values("color_gap_deg", ascending=True).reset_index(drop=True)
     n = len(df)
+    if row_h is None:
+        row_h = 22 if n <= 20 else 14 if n <= 40 else 12
+    # Build per-row labels: brand for unique brands, brand + index for multi-spot brands
+    brand_counts = df["brand"].value_counts()
+    seen: dict[str, int] = {}
+    labels: list[str] = []
+    for brand in df["brand"]:
+        if brand_counts[brand] == 1:
+            labels.append(brand)
+        else:
+            seen[brand] = seen.get(brand, 0) + 1
+            labels.append(f"{brand} {seen[brand]:02d}")
     label_w = 130
     plot_l = label_w
     plot_r = width - 40
@@ -331,7 +347,7 @@ def build_gap_svg(campaigns: pd.DataFrame, width: int = 720, row_h: int = 22) ->
         bar_w = gap / max_deg * value_w
         parts.append(
             f'<text x="{plot_l - 8}" y="{y + row_h * 0.65:.1f}" '
-            f'text-anchor="end" font-size="11" fill="#222">{row["brand"]}</text>'
+            f'text-anchor="end" font-size="10" fill="#222">{labels[i]}</text>'
         )
         parts.append(
             f'<rect x="{plot_l}" y="{y}" width="{bar_w:.1f}" height="{row_h - 6}" '
@@ -790,14 +806,31 @@ def render_report(
     )
     css = env.get_template("style.css.j2").render()
     patterns, playbook = load_patterns_and_playbook()
+    # Spot-level data for the gap-chart hero (one bar per of the ~47 spots
+    # so the bimodal distribution is visible). Falls back to campaigns
+    # if spots.parquet is absent (single-spot-per-brand corpora).
+    spots_path = config.PROCESSED_DIR / "spots.parquet"
+    spots = pd.read_parquet(spots_path) if spots_path.exists() else campaigns
+    n_total = len(spots)
+    n_close = int((spots["color_gap_deg"] < 20).sum())
+    n_far = int((spots["color_gap_deg"] > 100).sum())
+    n_mid = n_total - n_close - n_far
+    counts = {
+        "total": n_total,
+        "close": n_close,
+        "far": n_far,
+        "mid": n_mid,
+        "n_brands": len(campaigns),
+    }
     html = env.get_template("report.html.j2").render(
         inline_css=css,
         author=AUTHOR_NAME,
         repo_url=REPO_URL,
+        counts=counts,
         brand_rows=build_brand_rows(campaigns, palettes),
         scatter_svg=build_scatter_svg(campaigns),
         sector_ci_svg=build_sector_ci_svg(campaigns, metric="sat_std"),
-        gap_svg=build_gap_svg(campaigns),
+        gap_svg=build_gap_svg(spots),
         dendrogram_svg=build_dendrogram_svg(palettes, campaigns),
         patterns=patterns,
         playbook=playbook,
@@ -813,12 +846,30 @@ def _parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+def _remap_palettes_to_brand_level(palettes: pd.DataFrame) -> pd.DataFrame:
+    """Replace spot-level brand_id with brand-level brand_id by joining
+    against the corpus. After this remap, every palette row carries the
+    same brand_id that campaigns.parquet uses, so the SVG/PNG builders
+    aggregate across all spots of a brand without any signature change.
+    """
+    try:
+        specs = load_corpus()
+    except Exception as exc:
+        logger.warning("corpus load failed (%s); keeping spot-level brand_id", exc)
+        return palettes
+    spot_to_brand = {s.id: brand_kebab_id(s.brand) for s in specs}
+    out = palettes.copy()
+    out["brand_id"] = out["brand_id"].map(spot_to_brand).fillna(out["brand_id"])
+    return out
+
+
 def main() -> None:
     args = _parse_args()
     config.setup_logging(verbose=args.verbose)
     config.ensure_dirs()
     campaigns = pd.read_parquet(config.CAMPAIGNS_PARQUET)
     palettes = pd.read_parquet(config.FRAMES_PARQUET)
+    palettes = _remap_palettes_to_brand_level(palettes)
     out = render_report(campaigns, palettes)
     size_kb = out.stat().st_size / 1024
     logger.info("Wrote %s (%.1f KB)", out, size_kb)

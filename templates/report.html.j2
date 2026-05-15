@@ -14,18 +14,18 @@
 <header class="masthead">
     <p class="eyebrow">A field study, 2026</p>
     <h1>Brand color, or world color?</h1>
-    <p class="lede">A spot's picture either commits to the brand color or commits to a world. Eight of ten Czech TV spots do the latter; few realize they are choosing.</p>
+    <p class="lede">A spot's picture either commits to the brand color or commits to a world. Of {{ counts.total }} Czech TV spots from {{ counts.n_brands }} brands, {{ counts.close }} flood with brand color, {{ counts.far }} cede the picture to a world, and {{ counts.mid }} sit in between. Few realize they are choosing.</p>
     <p class="byline">By {{ author }}. <a href="{{ repo_url }}">Source on GitHub</a>.</p>
 </header>
 
 <section class="method">
     <p class="method-label">Method</p>
-    <p class="method-body">Ten publicly available Czech TV spots, sampled at one frame per second. Per-frame palettes via K-means (k = 5) in canonical CIE-LAB. For each spot we compute its dominant chromatic hue, the brand's anchor hue, and the circular distance between them. We then ask which camp the spot belongs to.</p>
+    <p class="method-body">{{ counts.total }} publicly available Czech TV spots across {{ counts.n_brands }} brands, sampled at one frame per second. Per-frame palettes via K-means (k = 5) in canonical CIE-LAB. For each spot we compute its dominant chromatic hue, the brand's anchor hue, and the circular distance between them. Strip and radial views aggregate frames across all spots of a brand; the bar chart in section 01 shows every spot separately.</p>
 </section>
 
 <section>
     <div class="section-label"><span class="num">01</span><h2>The split</h2></div>
-    <p class="section-intro">Distance, in degrees on the hue wheel, between each brand's anchor swatch and the dominant chromatic color the spot actually puts on screen. Bars are filled with the swatch; the dashed reference at 90&deg; marks the perceptual threshold beyond which the two are, effectively, different colors. Two spots sit below 20&deg;. Seven sit above 100&deg;. One brand straddles.</p>
+    <p class="section-intro">Distance, in degrees on the hue wheel, between each brand's anchor swatch and the dominant chromatic color the spot actually puts on screen. One bar per spot ({{ counts.total }} spots from {{ counts.n_brands }} brands), bars filled with the swatch; the dashed reference at 90&deg; marks the perceptual threshold beyond which the two are, effectively, different colors. {{ counts.close }} spots sit below 20&deg;. {{ counts.far }} sit above 100&deg;. {{ counts.mid }} sit in between.</p>
     <figure class="gap-frame">
         {{ gap_svg | safe }}
     </figure>

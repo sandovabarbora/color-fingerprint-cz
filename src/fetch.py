@@ -48,6 +48,16 @@ class BrandSpec:
     anchor_hex: str
 
 
+def brand_kebab_id(brand_display: str) -> str:
+    """Convert a brand display name to the kebab-id used in brand-level
+    aggregates (matches the logic in metrics.compute_all)."""
+    return (
+        "".join(c if c.isalnum() else "_" for c in brand_display.lower())
+        .strip("_")
+        .replace("__", "_")
+    )
+
+
 def load_corpus(path: Path = config.CORPUS_FILE) -> list[BrandSpec]:
     """Parse the corpus YAML into typed BrandSpec records.
 
@@ -89,17 +99,70 @@ def _build_ydl_opts(target_path: Path, dry_run: bool) -> dict[str, Any]:
 def _resolve_search(spec: BrandSpec) -> str:
     """Build the yt-dlp source string for a brand row.
 
-    When ``channel_url`` is provided we use YouTube's per-channel search
-    endpoint (``/search?query=...`` appended to the channel URL) — this
-    restricts results to videos uploaded by that channel, avoiding noise
-    from third-party reaction/review videos that often dominate global
-    ``ytsearch1:`` results. When no channel URL is given we fall back to
-    ``ytsearch1:`` over the query string.
+    Three modes, in priority order:
+
+    1. **Direct URL** — if ``search_query`` starts with ``http://`` or
+       ``https://``, treat it as a YouTube video URL and skip search
+       entirely. This is what ``scripts/discover_spots.py`` writes when
+       it has resolved a specific spot already.
+    2. **Channel-scoped search** — when ``channel_url`` is given, use
+       YouTube's per-channel search endpoint to avoid reaction/review
+       noise from global search.
+    3. **Global search** — fallback ``ytsearch1:`` over the query.
     """
+    if spec.search_query.startswith(("http://", "https://")):
+        return spec.search_query
     if spec.channel_url:
         base = spec.channel_url.rstrip("/")
         return f"{base}/search?query={urllib.parse.quote(spec.search_query)}"
     return f"ytsearch1:{spec.search_query}"
+
+
+def fetch_channel_top_n(
+    channel_url: str, max_count: int, over_fetch: int | None = None
+) -> list[dict[str, Any]]:
+    """Walk a channel's ``/videos`` tab and return up to ``max_count``
+    info_dicts that pass duration + view filters.
+
+    Args:
+        channel_url: e.g. ``https://www.youtube.com/@mcdonaldsczech``.
+        max_count: max number of qualifying entries to return.
+        over_fetch: how many entries to inspect from the top of the
+            channel. Defaults to ``max_count * 3`` to allow rejected
+            entries (too long, too few views, non-spot content).
+
+    Returns:
+        List of yt-dlp info_dicts (each with ``id``, ``title``,
+        ``duration``, ``view_count``, ``webpage_url``). Empty list on
+        error or no matches.
+    """
+    if over_fetch is None:
+        over_fetch = max_count * 3
+    videos_url = channel_url.rstrip("/") + "/videos"
+    opts: dict[str, Any] = {
+        "quiet": True,
+        "no_warnings": True,
+        "skip_download": True,
+        "playlist_items": f"1-{over_fetch}",
+        "socket_timeout": 30,
+    }
+    try:
+        with YoutubeDL(opts) as ydl:
+            info = ydl.extract_info(videos_url, download=False)
+    except (DownloadError, ExtractorError) as exc:
+        logger.warning("channel %s resolve error: %s", videos_url, exc)
+        return []
+    entries = (info or {}).get("entries") or []
+    passing: list[dict[str, Any]] = []
+    for entry in entries:
+        if not entry:
+            continue
+        passed, _reason = _passes_filters(entry)
+        if passed:
+            passing.append(entry)
+        if len(passing) >= max_count:
+            break
+    return passing
 
 
 def _passes_filters(info: dict[str, Any]) -> tuple[bool, str]:

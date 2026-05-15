@@ -1,0 +1,105 @@
+# Brand definitions — one row per brand.
+#
+# scripts/discover_spots.py walks each channel and writes the discovered
+# spots to config/corpus.yaml. corpus.yaml is the operational input that
+# the main pipeline reads; brands.yaml is the spec.
+#
+# Schema:
+#   id            kebab-case identifier
+#   brand         display name
+#   sector        QSR, Retail, Beverage, Automotive, Banking, Telecom,
+#                 Energy, Insurance, Furniture
+#   channel_url   official YouTube channel
+#   anchor_hex    canonical brand color for the brand-color-gap metric
+
+brands:
+  - id: mcdonalds
+    brand: McDonald's
+    sector: QSR
+    channel_url: https://www.youtube.com/@mcdonaldsczech
+    anchor_hex: "#FFC72C"
+
+  - id: penny
+    brand: Penny Market
+    sector: Retail
+    channel_url: https://www.youtube.com/@pennymarketcz
+    anchor_hex: "#E30613"
+
+  - id: kofola
+    brand: Kofola
+    sector: Beverage
+    channel_url: null  # no active brand channel; spot added manually below
+    anchor_hex: "#8B4513"
+
+  - id: pilsner
+    brand: Pilsner Urquell
+    sector: Beverage
+    channel_url: https://www.youtube.com/@PilsnerUrquellCZ
+    anchor_hex: "#00713C"
+
+  - id: mattoni
+    brand: Mattoni
+    sector: Beverage
+    channel_url: https://www.youtube.com/@mattoni
+    anchor_hex: "#0072CE"
+
+  - id: aaa_auto
+    brand: AAA Auto
+    sector: Automotive
+    channel_url: https://www.youtube.com/@aaaauto
+    anchor_hex: "#FFD500"
+
+  - id: fio
+    brand: Fio banka
+    sector: Banking
+    channel_url: https://www.youtube.com/@FioBanka
+    anchor_hex: "#00A551"
+
+  - id: tmobile
+    brand: T-Mobile
+    sector: Telecom
+    channel_url: https://www.youtube.com/@TMobileCZ
+    anchor_hex: "#E20074"
+
+  - id: vodafone
+    brand: Vodafone
+    sector: Telecom
+    channel_url: https://www.youtube.com/@VodafoneCZ
+    anchor_hex: "#E60000"
+
+  # --- New brands for the scale-up ---
+
+  - id: ceska_sporitelna
+    brand: Česká spořitelna
+    sector: Banking
+    channel_url: https://www.youtube.com/@ceskasporitelna
+    anchor_hex: "#0019A5"
+
+  - id: komercni_banka
+    brand: Komerční banka
+    sector: Banking
+    channel_url: https://www.youtube.com/@KomercniBanka
+    anchor_hex: "#A50064"
+
+  - id: albert
+    brand: Albert
+    sector: Retail
+    channel_url: https://www.youtube.com/@AlbertCeskaRepublika
+    anchor_hex: "#0067B1"
+
+  - id: lidl
+    brand: Lidl
+    sector: Retail
+    channel_url: https://www.youtube.com/@LidlCeskarepublika
+    anchor_hex: "#0050AA"
+
+  - id: skoda_auto
+    brand: Škoda Auto
+    sector: Automotive
+    channel_url: https://www.youtube.com/@SKODA
+    anchor_hex: "#4BA82E"
+
+  # Dropped: IKEA Czech (no active YouTube channel found),
+  # O2 (channel URL not resolvable),
+  # ČEZ (channel exists but no videos tab).
+  # Kofola handled via the kofola entry with manual direct-URL spot below.

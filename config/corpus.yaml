@@ -1,96 +1,330 @@
-# Curated corpus of Czech advertising spots for color-fingerprint analysis.
-#
-# Schema (per entry):
-#   id            unique kebab-case identifier (used as filename stem)
-#   brand         display name (may repeat across rows; e.g. two McDonald's spots)
-#   sector        one of: QSR, Retail, Beverage, Automotive, Banking, Telecom
-#   channel_url   YouTube channel to search inside; null = open YouTube search
-#   search_query  passed to yt-dlp's `ytsearch1:` resolver (or channel search)
-#   expected_year hint for human verification; not used as a filter
-#   anchor_hex    brand color anchor for the brand_anchor metric (LAB-distance basis)
-#
-# Runtime filters (applied in src/fetch.py, not declared here):
-#   - duration between 15 and 90 seconds
-#   - view_count > 10_000 (proxy for actual campaign vs leaked draft)
-#   - public + downloadable (yt-dlp will skip and log WARNING otherwise)
-
 brands:
-  - id: mcdonalds_syrova
-    brand: McDonald's
-    sector: QSR
-    channel_url: https://www.youtube.com/@mcdonaldsczech
-    search_query: Sýrová sezóna
-    expected_year: 2024
-    anchor_hex: "#FFC72C"  # golden yellow
-
-  - id: mcdonalds_mcnroll
-    brand: McDonald's
-    sector: QSR
-    channel_url: https://www.youtube.com/@mcdonaldsczech
-    search_query: Mc'n'Roll Forejt
-    expected_year: 2022
-    anchor_hex: "#FFC72C"
-
-  - id: penny_vanocni
-    brand: Penny Market
-    sector: Retail
-    channel_url: null
-    search_query: Penny Market vánoční reklama 2023
-    expected_year: 2023
-    anchor_hex: "#E30613"  # red
-
-  - id: kofola_menevice
-    brand: Kofola
-    sector: Beverage
-    channel_url: null
-    search_query: Kofola MéněVíce reklama 2022
-    expected_year: 2022
-    anchor_hex: "#8B4513"  # cola brown
-
-  - id: pilsner_vanocni
-    brand: Pilsner Urquell
-    sector: Beverage
-    channel_url: null
-    search_query: Pilsner Urquell vánoční spot
-    expected_year: 2022
-    anchor_hex: "#00713C"  # green
-
-  - id: mattoni_image
-    brand: Mattoni
-    sector: Beverage
-    channel_url: null
-    search_query: Mattoni reklama voda
-    expected_year: 2023
-    anchor_hex: "#0072CE"  # blue
-
-  - id: aaa_auto_tvspot
-    brand: AAA Auto
-    sector: Automotive
-    channel_url: null
-    search_query: AAA Auto reklama
-    expected_year: 2024
-    anchor_hex: "#FFD500"  # yellow
-
-  - id: fio_banka_tvspot
-    brand: Fio banka
-    sector: Banking
-    channel_url: null
-    search_query: Fio banka reklama 2023
-    expected_year: 2023
-    anchor_hex: "#00A551"  # green
-
-  - id: tmobile_image
-    brand: T-Mobile
-    sector: Telecom
-    channel_url: null
-    search_query: T-Mobile vánoční reklama
-    expected_year: 2023
-    anchor_hex: "#E20074"  # magenta
-
-  - id: vodafone_vanocni
-    brand: Vodafone
-    sector: Telecom
-    channel_url: null
-    search_query: Vodafone vánoční reklama
-    expected_year: 2024
-    anchor_hex: "#E60000"  # red
+- id: mcdonalds_01_l_pe_svetov_ho_menu
+  brand: McDonald's
+  sector: QSR
+  channel_url: null
+  search_query: https://www.youtube.com/watch?v=DC7JlS05NqQ
+  expected_year: '2026'
+  anchor_hex: '#FFC72C'
+- id: mcdonalds_02_loupe_sv_tov_ho_menu
+  brand: McDonald's
+  sector: QSR
+  channel_url: null
+  search_query: https://www.youtube.com/watch?v=4T5olKIExiU
+  expected_year: '2026'
+  anchor_hex: '#FFC72C'
+- id: mcdonalds_03_fakt_si_mysl_e_pozn
+  brand: McDonald's
+  sector: QSR
+  channel_url: null
+  search_query: https://www.youtube.com/watch?v=NecSnK0H3Eo
+  expected_year: '2025'
+  anchor_hex: '#FFC72C'
+- id: mcdonalds_04_fakt_mysl_e_zn_p_tel
+  brand: McDonald's
+  sector: QSR
+  channel_url: null
+  search_query: https://www.youtube.com/watch?v=8cMaGNhnOi4
+  expected_year: '2025'
+  anchor_hex: '#FFC72C'
+- id: mcdonalds_05_kto_z_priate_ov_si_t
+  brand: McDonald's
+  sector: QSR
+  channel_url: null
+  search_query: https://www.youtube.com/watch?v=l8vtotln-SE
+  expected_year: '2025'
+  anchor_hex: '#FFC72C'
+- id: penny_01_krou_kujeme_s_michal
+  brand: Penny Market
+  sector: Retail
+  channel_url: null
+  search_query: https://www.youtube.com/watch?v=aHbHReCscrg
+  expected_year: '2026'
+  anchor_hex: '#E30613'
+- id: penny_02_krou_kujeme_s_michal
+  brand: Penny Market
+  sector: Retail
+  channel_url: null
+  search_query: https://www.youtube.com/watch?v=46xr09ho7wY
+  expected_year: '2026'
+  anchor_hex: '#E30613'
+- id: penny_03_krou_kujeme_s_danou
+  brand: Penny Market
+  sector: Retail
+  channel_url: null
+  search_query: https://www.youtube.com/watch?v=sumSFCky338
+  expected_year: '2026'
+  anchor_hex: '#E30613'
+- id: penny_04_krou_kujeme_s_danou
+  brand: Penny Market
+  sector: Retail
+  channel_url: null
+  search_query: https://www.youtube.com/watch?v=VSCt3nvefq4
+  expected_year: '2026'
+  anchor_hex: '#E30613'
+- id: penny_05_krou_kujeme_s_michal
+  brand: Penny Market
+  sector: Retail
+  channel_url: null
+  search_query: https://www.youtube.com/watch?v=KzurejSoW30
+  expected_year: '2026'
+  anchor_hex: '#E30613'
+- id: pilsner_01_pilsner_urquell_alfo
+  brand: Pilsner Urquell
+  sector: Beverage
+  channel_url: null
+  search_query: https://www.youtube.com/watch?v=dLDHfeOEp38
+  expected_year: '2009'
+  anchor_hex: '#00713C'
+- id: mattoni_01_mattoni_imuno_podpor
+  brand: Mattoni
+  sector: Beverage
+  channel_url: null
+  search_query: https://www.youtube.com/watch?v=XGxYyVPplxw
+  expected_year: '2026'
+  anchor_hex: '#0072CE'
+- id: mattoni_02_mattoni_imuno
+  brand: Mattoni
+  sector: Beverage
+  channel_url: null
+  search_query: https://www.youtube.com/watch?v=bqP2aU_WMDM
+  expected_year: '2025'
+  anchor_hex: '#0072CE'
+- id: fio_01_pro_v_echny_pozemsk
+  brand: Fio banka
+  sector: Banking
+  channel_url: null
+  search_query: https://www.youtube.com/watch?v=PY5CRFrJk1c
+  expected_year: '2026'
+  anchor_hex: '#00A551'
+- id: fio_02_pro_v_echny_pozemsk
+  brand: Fio banka
+  sector: Banking
+  channel_url: null
+  search_query: https://www.youtube.com/watch?v=o6nphsm9fp8
+  expected_year: '2026'
+  anchor_hex: '#00A551'
+- id: fio_03_pro_v_echny_pozemsk
+  brand: Fio banka
+  sector: Banking
+  channel_url: null
+  search_query: https://www.youtube.com/watch?v=ERjyoUTeq0c
+  expected_year: '2026'
+  anchor_hex: '#00A551'
+- id: fio_04_pro_v_echny_pozemsk
+  brand: Fio banka
+  sector: Banking
+  channel_url: null
+  search_query: https://www.youtube.com/watch?v=uiqJryYE4MI
+  expected_year: '2026'
+  anchor_hex: '#00A551'
+- id: fio_05_pro_v_echny_pozemsk
+  brand: Fio banka
+  sector: Banking
+  channel_url: null
+  search_query: https://www.youtube.com/watch?v=4lR8z4mfpdk
+  expected_year: '2025'
+  anchor_hex: '#00A551'
+- id: tmobile_01_magenta_tv_uv_d_ve_e
+  brand: T-Mobile
+  sector: Telecom
+  channel_url: null
+  search_query: https://www.youtube.com/watch?v=wJUrGWpS6f4
+  expected_year: '2026'
+  anchor_hex: '#E20074'
+- id: tmobile_02_magenta_tv_uv_d_ve_e
+  brand: T-Mobile
+  sector: Telecom
+  channel_url: null
+  search_query: https://www.youtube.com/watch?v=BYX9PQwjf-Q
+  expected_year: '2026'
+  anchor_hex: '#E20074'
+- id: tmobile_03_t_fiber_uv_d_ve_ern
+  brand: T-Mobile
+  sector: Telecom
+  channel_url: null
+  search_query: https://www.youtube.com/watch?v=T1nH_yhDxJw
+  expected_year: '2026'
+  anchor_hex: '#E20074'
+- id: tmobile_04_t_fiber_uv_d_ve_ern
+  brand: T-Mobile
+  sector: Telecom
+  channel_url: null
+  search_query: https://www.youtube.com/watch?v=rznKB4D-Xrs
+  expected_year: '2026'
+  anchor_hex: '#E20074'
+- id: tmobile_05_magenta_tv_uv_d_ve_e
+  brand: T-Mobile
+  sector: Telecom
+  channel_url: null
+  search_query: https://www.youtube.com/watch?v=zH69wgJhCSo
+  expected_year: '2026'
+  anchor_hex: '#E20074'
+- id: vodafone_01_nejlep_pevn_internet
+  brand: Vodafone
+  sector: Telecom
+  channel_url: null
+  search_query: https://www.youtube.com/watch?v=dGMa5T3_3N4
+  expected_year: '2026'
+  anchor_hex: '#E60000'
+- id: vodafone_02_sta_jednou_ct
+  brand: Vodafone
+  sector: Telecom
+  channel_url: null
+  search_query: https://www.youtube.com/watch?v=ok6D51aP3-0
+  expected_year: '2026'
+  anchor_hex: '#E60000'
+- id: vodafone_03_u_20_let_posouv_me_e
+  brand: Vodafone
+  sector: Telecom
+  channel_url: null
+  search_query: https://www.youtube.com/watch?v=BVmLlJ1X8h4
+  expected_year: '2026'
+  anchor_hex: '#E60000'
+- id: vodafone_04_20_let_na_je_t_lep_s
+  brand: Vodafone
+  sector: Telecom
+  channel_url: null
+  search_query: https://www.youtube.com/watch?v=aRO3Qq4HeTo
+  expected_year: '2026'
+  anchor_hex: '#E60000'
+- id: vodafone_05_je_tu_giga_kombo
+  brand: Vodafone
+  sector: Telecom
+  channel_url: null
+  search_query: https://www.youtube.com/watch?v=LAUhEKA9nNE
+  expected_year: '2026'
+  anchor_hex: '#E60000'
+- id: komercni_banka_01_astn_a_bezpe_n_sv_tk
+  brand: Komerční banka
+  sector: Banking
+  channel_url: null
+  search_query: https://www.youtube.com/watch?v=xeGciu-JMg4
+  expected_year: '2025'
+  anchor_hex: '#A50064'
+- id: komercni_banka_02_bezpe_n_et_zdarma_s
+  brand: Komerční banka
+  sector: Banking
+  channel_url: null
+  search_query: https://www.youtube.com/watch?v=ACxC7TwYxYA
+  expected_year: '2025'
+  anchor_hex: '#A50064'
+- id: albert_01_objevte_nov_gourmet
+  brand: Albert
+  sector: Retail
+  channel_url: null
+  search_query: https://www.youtube.com/watch?v=Dxbx6r6Jdvg
+  expected_year: '2026'
+  anchor_hex: '#0067B1'
+- id: albert_02_dop_ejte_si_vyj_me_n
+  brand: Albert
+  sector: Retail
+  channel_url: null
+  search_query: https://www.youtube.com/watch?v=1O9hFIasiN8
+  expected_year: '2026'
+  anchor_hex: '#0067B1'
+- id: albert_03_ka_d_rok_darujeme_v
+  brand: Albert
+  sector: Retail
+  channel_url: null
+  search_query: https://www.youtube.com/watch?v=eaV1Z-7d5YM
+  expected_year: '2025'
+  anchor_hex: '#0067B1'
+- id: albert_04_sleva_15_s_m_j_alber
+  brand: Albert
+  sector: Retail
+  channel_url: null
+  search_query: https://www.youtube.com/watch?v=f2E0ulMaOpE
+  expected_year: '2025'
+  anchor_hex: '#0067B1'
+- id: albert_05_vychutnejte_si_alber
+  brand: Albert
+  sector: Retail
+  channel_url: null
+  search_query: https://www.youtube.com/watch?v=G5di8f1fCWk
+  expected_year: '2025'
+  anchor_hex: '#0067B1'
+- id: lidl_01_v_e_pro_skv_l_grilov
+  brand: Lidl
+  sector: Retail
+  channel_url: null
+  search_query: https://www.youtube.com/watch?v=Oz047619h6U
+  expected_year: '2026'
+  anchor_hex: '#0050AA'
+- id: lidl_02_ji_ve_tvrtek_v_lidlu
+  brand: Lidl
+  sector: Retail
+  channel_url: null
+  search_query: https://www.youtube.com/watch?v=BWU793IjIBA
+  expected_year: '2026'
+  anchor_hex: '#0050AA'
+- id: lidl_03_vyb_rejte_z_v_ce_ne
+  brand: Lidl
+  sector: Retail
+  channel_url: null
+  search_query: https://www.youtube.com/watch?v=A7GPkW39fXA
+  expected_year: '2026'
+  anchor_hex: '#0050AA'
+- id: lidl_04_ak_n_nab_dka_od_tvrt
+  brand: Lidl
+  sector: Retail
+  channel_url: null
+  search_query: https://www.youtube.com/watch?v=BuiiotZubp4
+  expected_year: '2026'
+  anchor_hex: '#0050AA'
+- id: lidl_05_ovoce_a_zelenina_z_l
+  brand: Lidl
+  sector: Retail
+  channel_url: null
+  search_query: https://www.youtube.com/watch?v=OZrTvywdin4
+  expected_year: '2026'
+  anchor_hex: '#0050AA'
+- id: skoda_auto_01_koda_peaq_explained
+  brand: Škoda Auto
+  sector: Automotive
+  channel_url: null
+  search_query: https://www.youtube.com/watch?v=8Ki6zVL9srw
+  expected_year: '2026'
+  anchor_hex: '#4BA82E'
+- id: skoda_auto_02_koda_duobell_the_fir
+  brand: Škoda Auto
+  sector: Automotive
+  channel_url: null
+  search_query: https://www.youtube.com/watch?v=zDaVPfpQvPI
+  expected_year: '2026'
+  anchor_hex: '#4BA82E'
+- id: skoda_auto_03_meet_koda_peaq_the_u
+  brand: Škoda Auto
+  sector: Automotive
+  channel_url: null
+  search_query: https://www.youtube.com/watch?v=1wlOnYXVBkE
+  expected_year: '2026'
+  anchor_hex: '#4BA82E'
+- id: skoda_auto_04_big_possibilities_in
+  brand: Škoda Auto
+  sector: Automotive
+  channel_url: null
+  search_query: https://www.youtube.com/watch?v=iNa757O0CTU
+  expected_year: '2026'
+  anchor_hex: '#4BA82E'
+- id: skoda_auto_05_the_all_electric_7_s
+  brand: Škoda Auto
+  sector: Automotive
+  channel_url: null
+  search_query: https://www.youtube.com/watch?v=WrPYUv8DO_U
+  expected_year: '2026'
+  anchor_hex: '#4BA82E'
+- id: kofola_manual_menevice
+  brand: Kofola
+  sector: Beverage
+  channel_url: null
+  search_query: https://www.youtube.com/watch?v=MS2EJMT2pyg
+  expected_year: '2022'
+  anchor_hex: '#8B4513'
+- id: aaa_auto_manual_pobocku
+  brand: AAA Auto
+  sector: Automotive
+  channel_url: null
+  search_query: https://www.youtube.com/watch?v=PSodFCY2CCQ
+  expected_year: '2024'
+  anchor_hex: '#FFD500'

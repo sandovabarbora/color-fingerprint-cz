@@ -28,7 +28,7 @@ import numpy as np
 import pandas as pd
 
 from src import config
-from src.fetch import BrandSpec, load_corpus
+from src.fetch import BrandSpec, brand_kebab_id, load_corpus
 
 # Threshold below which a cluster's hue is too noisy to count toward the
 # "dominant chromatic hue" — desaturated centroids (grays, browns at the
@@ -434,31 +434,69 @@ def compute_brand_metrics(
 
 
 def compute_all(specs: list[BrandSpec], palettes: pd.DataFrame) -> pd.DataFrame:
-    """Compute per-brand metrics for every spec present in palettes.
+    """Compute per-brand metrics by aggregating frames across all the
+    brand's spots.
+
+    When the corpus contains multiple spots per brand (typical after
+    ``scripts/discover_spots.py`` expands the corpus), this function
+    pools the palette rows of every spot belonging to a brand and runs
+    the brand-level metrics on the pooled data. Frame counts and spot
+    counts are reported so the underlying sample is visible.
 
     Returns:
-        DataFrame with one row per brand_id. Brands absent from
-        ``palettes`` are skipped with a WARNING.
+        DataFrame with one row per brand display name. Brands with no
+        retained palette rows are skipped with a WARNING.
     """
     rows: list[dict[str, object]] = []
+    # Group specs by display brand. Preserves first-seen order.
+    by_brand: dict[str, list[BrandSpec]] = {}
     for spec in specs:
-        sub = palettes[palettes["brand_id"] == spec.id]
+        by_brand.setdefault(spec.brand, []).append(spec)
+
+    for brand, brand_specs in by_brand.items():
+        spot_ids = [s.id for s in brand_specs]
+        sub = palettes[palettes["brand_id"].isin(spot_ids)]
         if sub.empty:
-            logger.warning("[%s] no palette rows — skip", spec.id)
+            logger.warning("[%s] no palette rows across %d spots — skip", brand, len(spot_ids))
             continue
-        row = compute_brand_metrics(spec.id, spec, sub)
+        first = brand_specs[0]
+        brand_id = brand_kebab_id(brand)
+        row = compute_brand_metrics(brand_id, first, sub)
+        row["brand_id"] = brand_id
+        row["brand"] = brand
+        row["n_spots"] = len(brand_specs)
         rows.append(row)
         logger.info(
-            "[%s] div=%.1f sat=%.2f/%.2f anchor=%.2f gap=%s shape=%s n=%d",
-            spec.id,
+            "[%s] n_spots=%d frames=%d div=%.1f sat=%.2f/%.2f anchor=%.2f gap=%s shape=%s",
+            brand,
+            row["n_spots"],
+            row["n_frames"],
             row["diversity"],
             row["sat_mean"],
             row["sat_std"],
             row["brand_anchor"],
             f"{row['color_gap_deg']:.1f}°" if not np.isnan(row["color_gap_deg"]) else "n/a",
             row["arc_shape"],
-            row["n_frames"],
         )
+    return pd.DataFrame(rows)
+
+
+def compute_per_spot(specs: list[BrandSpec], palettes: pd.DataFrame) -> pd.DataFrame:
+    """Per-spot metrics: one row per corpus entry (no brand aggregation).
+
+    Useful for thesis counts like "X of N spots commit to a world", where
+    the unit of analysis is the individual spot, not the brand.
+    """
+    rows: list[dict[str, object]] = []
+    for spec in specs:
+        sub = palettes[palettes["brand_id"] == spec.id]
+        if sub.empty:
+            continue
+        row = compute_brand_metrics(spec.id, spec, sub)
+        row["brand_id"] = spec.id
+        row["brand"] = spec.brand
+        row["n_spots"] = 1
+        rows.append(row)
     return pd.DataFrame(rows)
 
 
@@ -477,9 +515,15 @@ def main() -> None:
     config.ensure_dirs()
     specs = load_corpus()
     palettes = pd.read_parquet(config.FRAMES_PARQUET)
-    metrics = compute_all(specs, palettes)
-    metrics.to_parquet(config.CAMPAIGNS_PARQUET, index=False)
-    logger.info("Wrote %d brand metric rows -> %s", len(metrics), config.CAMPAIGNS_PARQUET)
+
+    brand_level = compute_all(specs, palettes)
+    brand_level.to_parquet(config.CAMPAIGNS_PARQUET, index=False)
+    logger.info("Wrote %d brand metric rows -> %s", len(brand_level), config.CAMPAIGNS_PARQUET)
+
+    spot_level = compute_per_spot(specs, palettes)
+    spots_path = config.PROCESSED_DIR / "spots.parquet"
+    spot_level.to_parquet(spots_path, index=False)
+    logger.info("Wrote %d spot metric rows -> %s", len(spot_level), spots_path)
 
 
 if __name__ == "__main__":

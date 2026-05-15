@@ -1,68 +1,66 @@
 # Patterns + playbook rendered into outputs/index.html.
 #
-# Every pattern argues one facet of the central thesis: brand color and
-# on-screen color are usually different colors, the split forms two
-# camps, and the decision is most often accidental.
+# Every pattern argues one facet of the central thesis: a TV spot's
+# picture either commits to brand color or commits to a world, and most
+# of the time the choice is accidental, not made.
 #
 # The playbook is the so-what: how a strategist or creative director
 # decides which camp the next spot belongs to, on purpose.
 
 patterns:
   - title: >-
-      Two camps, eight commitments to "world", two commitments to
-      "brand color".
+      Three regimes emerge, not two.
     evidence: >-
-      Below 20&deg; gap: McDonald's Sýrová sezóna (8&deg;) and Kofola
-      MéněVíce (11&deg;). Above 100&deg; gap: seven spots, including
-      Mattoni (167&deg;), AAA Auto (159&deg;), T-Mobile Vánoce (153&deg;)
-      and Penny Vánoční (138&deg;). One brand straddles, Vodafone
-      Vánoční at 49&deg;. The histogram is bimodal, not a continuum.
+      Across 47 spots from 13 brands: 16 commit to brand color (gap below
+      20&deg;), 11 cede the picture to a world (gap above 100&deg;), and
+      20 sit in the middle. The middle is not a third style; it is what
+      happens when no decision is made.
     takeaway: >-
-      A spot is one of two things. A flood of brand color (and the
-      product had better be that color). Or a world the brand visits
-      with its logo. The middle is rare and usually accidental.
+      The extremes are deliberate. The middle is drift. A brief that does
+      not pick a camp lands in the middle by default, and the middle
+      reads as visually weak in every category we measured.
 
   - title: >-
-      The two camps make different creative trades, and pay different
-      prices.
+      Where a brand lands says more about the brief than about the brand.
     evidence: >-
-      Brand-color spots stay tight: Kofola at 14 diversity, McDonald's
-      Sýrová at 27, both with anchor share 47% and 48% respectively.
-      World-color spots range wider: Mc'n'Roll diversity 27, Mattoni 21,
-      AAA Auto 23, with anchor share dropping to 0.001% (AAA), 1%
-      (Mattoni), 4% (T-Mobile). The brand-color camp pays in palette
-      breadth; the world-color camp pays in brand recall on screen.
+      Same sector, opposite strategies: Penny Market's five spots compress
+      the gap to 8.6&deg; (brand red on 36% of screen); Albert's five
+      spots stretch it to 174&deg; (Albert blue on 2% of screen). Both
+      Czech retailers. Both consistent internally. The five spots within
+      each brand cluster tight, the two brands sit at opposite ends of
+      the field.
     takeaway: >-
-      Neither trade is wrong. Both have a price. The choice should be
-      a brief decision, not an editorial accident discovered in the cut.
+      A brand can choose either camp. Albert's warm-bistro world is a
+      legitimate creative move; so is Penny's promo flood. What is not
+      legitimate is choosing accidentally.
 
   - title: >-
-      The split is structural. Same brand, two spots, two cameras.
+      Categories have tendencies, not destinies.
     evidence: >-
-      McDonald's appears twice in the dendrogram and the two spots
-      cluster closer to each other than to anyone else. Sýrová sezóna
-      is a brand-color spot (8&deg; gap, yellow on 48% of screen).
-      Mc'n'Roll is a world-color spot (106&deg; gap, yellow on 25%).
-      Same brand color, same anchor swatch, opposite jobs. The brand's
-      identity holds across both; the picture's job does not.
+      Banking world-leans (Komer&#269;n&iacute; banka 142&deg;, Fio 85&deg;),
+      automotive world-leans (AAA Auto 159&deg;, &Scaron;koda 79&deg;),
+      telecom brand-floods (T-Mobile 12&deg;, Vodafone 15&deg;), retail
+      splits cleanly (Lidl 6&deg;, Penny 9&deg;, Albert 174&deg;).
+      QSR sits brand-led (McDonald's 22&deg;), beverage splits
+      (Kofola 11&deg;, Pilsner 102&deg;).
     takeaway: >-
-      Brand color is not a constant within a brand. It is a creative
-      parameter set per spot. Decide what job the swatch is doing this
-      time: hero, accent, or none.
+      The category sets the gravity well; the brief decides whether to
+      follow it. Going against your category's default is bolder almost
+      by construction, but only when the spot can carry the weight.
 
   - title: >-
-      Sector predicts the default camp, not the right answer.
+      The brand color cliff: floods commit, ceders abandon.
     evidence: >-
-      Automotive (AAA, 159&deg;) and banking (Fio, 102&deg;) default
-      hard to world-color. Telecom (T-Mobile 153&deg;, Vodafone 49&deg;)
-      splits. QSR contains both extremes (McDonald's Sýrová 8&deg; vs
-      Mc'n'Roll 106&deg;). The category sets the gravity well; the
-      brief decides whether to follow it.
+      Brand-led brands run anchor share 25 to 56% (Lidl 56%, Penny 36%,
+      Vodafone 31%, T-Mobile 19%, McDonald's 25%). World-led brands sit
+      under 5% (Albert 2%, Pilsner 0.2%, AAA Auto 0.001%, Komer&#269;n&iacute;
+      banka 0.0%). The middle group is between 5 and 25%; almost no brand
+      sits in the 10 to 20% region for long.
     takeaway: >-
-      If your category defaults to world-color, a brand-color spot is
-      distinctive almost by construction. If your category defaults to
-      brand-color, a world-color spot is the bolder counter-position.
-      Either move is harder to land without naming it first.
+      Brand color presence is bimodal in practice. Either the swatch is
+      the picture or the swatch is just the logo. Targeting "moderate
+      brand presence" sounds reasonable but usually produces the muddle
+      no one remembers.
 
 playbook:
   - title: >-
@@ -70,40 +68,41 @@ playbook:
     body: >-
       Before greenlight, agree with the client which camp the spot
       belongs to and what the target gap is. Brand-color: target gap
-      below 20&deg;, anchor share above 40%. World-color: target gap
-      above 100&deg;, anchor share below 10%. The middle (Vodafone's
-      49&deg; / 17%) is usually a hedged outcome, not a choice.
+      below 20&deg;, anchor share above 30%. World-color: target gap
+      above 100&deg;, anchor share below 10%. The middle is the muddle.
+      Pick a side.
 
   - title: >-
       If brand-color: pick a product whose color IS the brand color.
     body: >-
-      Sýrová sezóna works because cheese is yellow. Kofola works because
-      the world is warm-brown. Forcing brand-color flood when the
-      product fights the swatch (a green logo on a beige insurance ad)
-      reads as desperation. If the product cannot carry the color,
-      switch camps.
+      Lidl's blue and the supermarket aisles light up together; Penny's
+      red and the price tags blur into one signal; McDonald's yellow and
+      the fries belong on the same shot. Forcing a brand-color flood
+      when the product fights the swatch (a green logo on a beige
+      insurance ad) reads as desperation. If the product cannot carry
+      the color, switch camps.
 
   - title: >-
       If world-color: design the world, let the logo carry the brand.
     body: >-
-      AAA Auto's spot lives in 9% mean saturation; the yellow never
-      appears in the picture. That is fine; the logo end-card carries
-      the brand. Stop chasing "more brand color on screen" as a goal.
-      Chase a more deliberately built world instead.
+      Albert lives in 2% anchor, AAA Auto in 0.001%, Komer&#269;n&iacute;
+      banka in 0%. All three are intentional. The picture is the spot;
+      the logo end-card is the brand. Stop chasing more brand color on
+      screen as a goal. Chase a more deliberately built world instead.
 
   - title: >-
       Score competitors on the gap axis as the first pitch slide.
     body: >-
       Run this pipeline on the client's three competitors. Show them
       where the category lives on the gap axis. Then name where the
-      next spot will land. Distinctiveness becomes a coordinate. Worth
-      doing especially in categories where every brand has converged
-      (banking, telco, automotive).
+      next spot will land. Distinctiveness becomes a coordinate.
+      Especially useful where every brand has converged (banking,
+      automotive, premium beverage).
 
   - title: >-
       Score the dailies, not just the finished cut.
     body: >-
       The pipeline runs on rough footage in minutes. If the brief
       committed to brand-color (gap under 20&deg;) and the dailies are
-      scoring 80&deg;, you have caught the drift before it is baked
-      into the edit. Cheap insurance on expensive shoots.
+      scoring 80&deg;, you have caught the drift before it is baked into
+      the edit. Cheap insurance on expensive shoots.
