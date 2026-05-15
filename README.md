@@ -90,6 +90,30 @@ make test             # pytest
 
 ---
 
+## Method audit
+
+Two parameter choices in the pipeline could affect the brand-vs-world
+ranking. Both were swept and the ranking is stable across reasonable
+ranges (`scripts/sensitivity.py`).
+
+**Anchor tolerance (used: ±15°).** Spearman correlation of brand-level
+anchor-share rankings at other tolerances against the used setting:
+
+| Tolerance | ±5° | ±10° | ±15° | ±20° | ±25° |
+|---|---|---|---|---|---|
+| ρ vs base | 0.971 | 0.989 | 1.000 | 0.978 | 0.956 |
+
+**K-means k (used: k = 5).** Spearman correlation of brand-color-gap
+rankings at other k values against k = 5, sampled at 15 frames per
+brand for cost:
+
+| k | 3 | 4 | 5 | 6 | 7 | 8 |
+|---|---|---|---|---|---|---|
+| ρ vs base | 0.962 | 0.984 | 1.000 | 0.989 | 0.984 | 0.962 |
+
+All correlations exceed 0.95. The thesis is not an artifact of either
+choice.
+
 ## Limitations
 
 Every choice trades one fidelity for another. The honest list:
