@@ -34,3 +34,6 @@ pipeline.log
 .idea/
 .vscode/
 *.swp
+
+# Private outreach drafts (Barbora's per-recipient cover letters)
+COVER_LETTER*.md
