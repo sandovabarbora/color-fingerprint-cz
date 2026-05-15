@@ -1,0 +1,37 @@
+# Curated observations rendered into outputs/index.html.
+# Each entry: a one-line observation (with a specific number) + a one-line
+# interpretation. Keep both under ~50 words combined per the brief.
+
+insights:
+  - obs: >-
+      AAA Auto's spot lives in 9% mean saturation and uses its brand
+      yellow on under 0.001% of screen-time.
+    interp: >-
+      The visual identity of the spot has been fully ceded to the
+      product — cars, dealerships, neutral gray. The logo carries the
+      brand; the picture is documentary.
+
+  - obs: >-
+      Two McDonald's spots, same yellow anchor, opposite roles for it —
+      48% of the screen in Sýrová sezóna, only 25% in Mc'n'Roll.
+    interp: >-
+      A product launch saturates with brand color; a music-video
+      collaboration steps back to let the artist's world set the
+      palette. Same brand, two completely different jobs for color.
+
+  - obs: >-
+      Saturation tension (std) cleaves the corpus in two — Mc'n'Roll
+      (0.20) and Mattoni (0.19) at one end, Fio banka (0.05) and
+      AAA Auto (0.04) at the other.
+    interp: >-
+      Performative formats — music video, cinematic water mythology —
+      build by swinging between moody and bright. Corporate categories
+      flatten the curve and live at one saturation throughout.
+
+  - obs: >-
+      Mattoni's brand color is a flat blue (#0072CE), but only 1% of
+      its on-screen weight sits within ±15° of that hue.
+    interp: >-
+      The spot is full of turquoise water, which is roughly 30°
+      away from the brand swatch. The brand color and the product
+      color are different colors. A small but real strategic gap.
