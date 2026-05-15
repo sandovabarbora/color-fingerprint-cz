@@ -32,5 +32,6 @@ def test_pipeline_constants_have_sane_defaults() -> None:
     assert config.RANDOM_STATE == 42
     assert config.KMEANS_N_INIT >= 1
     assert config.MIN_DURATION_S < config.MAX_DURATION_S
+    assert config.MAX_DURATION_S <= 300  # don't accidentally admit long-form
     assert config.MIN_VIEW_COUNT > 0
     assert 0 < config.BRAND_ANCHOR_HUE_TOLERANCE_DEG <= 90

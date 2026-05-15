@@ -19,7 +19,7 @@ brands:
     brand: McDonald's
     sector: QSR
     channel_url: https://www.youtube.com/@mcdonaldsczech
-    search_query: Sýrová sezóna 2024
+    search_query: Sýrová sezóna
     expected_year: 2024
     anchor_hex: "#FFC72C"  # golden yellow
 
@@ -27,7 +27,7 @@ brands:
     brand: McDonald's
     sector: QSR
     channel_url: https://www.youtube.com/@mcdonaldsczech
-    search_query: Mc'n'Roll Forejt 2022
+    search_query: Mc'n'Roll Forejt
     expected_year: 2022
     anchor_hex: "#FFC72C"
 
@@ -51,7 +51,7 @@ brands:
     brand: Pilsner Urquell
     sector: Beverage
     channel_url: null
-    search_query: Pilsner Urquell vánoční reklama
+    search_query: Pilsner Urquell vánoční spot
     expected_year: 2022
     anchor_hex: "#00713C"  # green
 
@@ -59,15 +59,15 @@ brands:
     brand: Mattoni
     sector: Beverage
     channel_url: null
-    search_query: Mattoni reklama imageová
+    search_query: Mattoni reklama voda
     expected_year: 2023
     anchor_hex: "#0072CE"  # blue
 
   - id: aaa_auto_tvspot
     brand: AAA Auto
     sector: Automotive
-    channel_url: https://www.youtube.com/user/aaaauto
-    search_query: AAA Auto TV spot 2024
+    channel_url: null
+    search_query: AAA Auto reklama
     expected_year: 2024
     anchor_hex: "#FFD500"  # yellow
 
@@ -83,7 +83,7 @@ brands:
     brand: T-Mobile
     sector: Telecom
     channel_url: null
-    search_query: T-Mobile reklama imageová
+    search_query: T-Mobile vánoční reklama
     expected_year: 2023
     anchor_hex: "#E20074"  # magenta
 
@@ -91,6 +91,6 @@ brands:
     brand: Vodafone
     sector: Telecom
     channel_url: null
-    search_query: Vodafone vánoční reklama Dvojitá radost 2024
+    search_query: Vodafone vánoční reklama
     expected_year: 2024
     anchor_hex: "#E60000"  # red

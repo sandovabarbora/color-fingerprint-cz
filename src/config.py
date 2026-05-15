@@ -37,7 +37,10 @@ RANDOM_STATE: int = 42
 KMEANS_N_INIT: int = 10
 
 MIN_DURATION_S: float = 15.0
-MAX_DURATION_S: float = 90.0
+# 180s admits musical/storytelling formats (e.g. Mc'n'Roll, 134s) that
+# behave like spots but exceed the typical 60-90s TV slot. Long-form
+# content (interviews, behind-the-scenes) is still filtered.
+MAX_DURATION_S: float = 180.0
 MIN_VIEW_COUNT: int = 10_000
 
 INTRO_SKIP_S: float = 0.5
