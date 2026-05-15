@@ -58,9 +58,13 @@
 </section>
 
 <section>
-<h2>What this means</h2>
-{% for line in conclusion %}
-<p class="conclusion">{{ line }}</p>
+<h2>Playbook — what to do with this</h2>
+<p class="lede-small">Five moves an agency strategist or creative director can run on next week's pitch.</p>
+{% for move in playbook %}
+<div class="play">
+    <h3><span class="play-num">{{ loop.index }}.</span> {{ move.title }}</h3>
+    <p class="play-body">{{ move.body }}</p>
+</div>
 {% endfor %}
 </section>
 

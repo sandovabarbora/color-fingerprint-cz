@@ -345,22 +345,23 @@ def build_gap_svg(campaigns: pd.DataFrame, width: int = 720, row_h: int = 22) ->
 # --- Insights --------------------------------------------------------------
 
 
-def load_patterns_and_conclusion(
+def load_patterns_and_playbook(
     path: Path = config.PROJECT_ROOT / "config" / "insights.yaml",
-) -> tuple[list[dict[str, str]], list[str]]:
-    """Load patterns + conclusion strings from YAML.
+) -> tuple[list[dict[str, str]], list[dict[str, str]]]:
+    """Load patterns + playbook from YAML.
 
     Returns:
-        ``(patterns, conclusion)``. Patterns is a list of
-        ``{title, evidence, takeaway}`` dicts; conclusion is a list of
-        paragraph strings. Empty lists if the file is absent.
+        ``(patterns, playbook)``. Patterns is a list of
+        ``{title, evidence, takeaway}`` dicts (what's true); playbook is
+        a list of ``{title, body}`` dicts (what to do about it). Empty
+        lists if the file is absent.
     """
     if not path.exists():
         return ([], [])
     raw = yaml.safe_load(path.read_text(encoding="utf-8"))
     patterns = list(raw.get("patterns", []))
-    conclusion = list(raw.get("conclusion", []))
-    return patterns, conclusion
+    playbook = list(raw.get("playbook", []))
+    return patterns, playbook
 
 
 # --- Rendering -------------------------------------------------------------
@@ -403,7 +404,7 @@ def render_report(
         lstrip_blocks=True,
     )
     css = env.get_template("style.css.j2").render()
-    patterns, conclusion = load_patterns_and_conclusion()
+    patterns, playbook = load_patterns_and_playbook()
     html = env.get_template("report.html.j2").render(
         inline_css=css,
         author=AUTHOR_NAME,
@@ -412,7 +413,7 @@ def render_report(
         scatter_svg=build_scatter_svg(campaigns),
         gap_svg=build_gap_svg(campaigns),
         patterns=patterns,
-        conclusion=conclusion,
+        playbook=playbook,
     )
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(html, encoding="utf-8")
