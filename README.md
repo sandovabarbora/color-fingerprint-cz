@@ -112,7 +112,7 @@ Every choice trades one fidelity for another. The honest list:
 ## Project structure
 
 ```
-bubble-color-fingerprint/
+color-fingerprint-cz/
 ├── config/
 │   ├── corpus.yaml         # curated brand × spot list
 │   └── insights.yaml       # observations rendered into the report

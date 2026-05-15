@@ -37,7 +37,7 @@ from src import config
 logger = logging.getLogger(__name__)
 
 AUTHOR_NAME = "Barbora Šandová"
-REPO_URL = "https://github.com/sandovabarbora/bubble-color-fingerprint"
+REPO_URL = "https://github.com/sandovabarbora/color-fingerprint-cz"
 
 
 # --- Color strip SVG -------------------------------------------------------

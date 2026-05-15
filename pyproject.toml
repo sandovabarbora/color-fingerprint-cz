@@ -1,5 +1,5 @@
 [project]
-name = "bubble-color-fingerprint"
+name = "color-fingerprint-cz"
 version = "0.1.0"
 description = "Color fingerprint analysis of Czech advertising spots — extract dominant palettes via K-means in LAB color space and render a minimalist HTML report."
 authors = [{ name = "Barbora Šandová" }]
