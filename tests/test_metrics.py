@@ -92,3 +92,59 @@ def test_frame_saturation_one_for_pure_primary() -> None:
     pal["rgb_g"] = 0
     pal["rgb_b"] = 0
     assert metrics.frame_saturation(pal) == 1.0
+
+
+def test_dominant_hue_is_none_for_grayscale() -> None:
+    """Achromatic centroids contribute no chromatic identity."""
+    pal = _palette([(50, 0, 0)] * 3, [0.4, 0.3, 0.3])
+    pal["rgb_r"] = 128
+    pal["rgb_g"] = 128
+    pal["rgb_b"] = 128
+    assert metrics.dominant_chromatic_hue(pal) is None
+
+
+def test_dominant_hue_recovers_pure_red() -> None:
+    pal = _palette([(50, 0, 0)] * 3, [0.4, 0.3, 0.3])
+    pal["rgb_r"] = 255
+    pal["rgb_g"] = 0
+    pal["rgb_b"] = 0
+    hue = metrics.dominant_chromatic_hue(pal)
+    assert hue is not None
+    assert metrics._hue_circular_distance(hue, 0.0) < 1.0
+
+
+def test_brand_color_gap_zero_when_anchor_matches_dominant() -> None:
+    pal = _palette([(50, 0, 0)] * 2, [0.5, 0.5])
+    pal["rgb_r"] = 255
+    pal["rgb_g"] = 0
+    pal["rgb_b"] = 0
+    gap = metrics.brand_color_gap_deg(pal, anchor_hex="#FF0000")
+    assert gap is not None and gap < 1.0
+
+
+def test_arc_shape_flat_for_constant_saturation() -> None:
+    rows = []
+    for fid in range(5):
+        df = _palette([(50, 0, 0)] * 2, [0.5, 0.5])
+        df["frame_id"] = f"f{fid}"
+        df["rgb_r"], df["rgb_g"], df["rgb_b"] = 200, 50, 50
+        rows.append(df)
+    pal = pd.concat(rows, ignore_index=True)
+    assert metrics.arc_shape(pal) == "flat"
+
+
+def test_arc_shape_rising_when_saturation_climbs() -> None:
+    """Monotone-rising saturation -> 'rising'."""
+    rows = []
+    # 5 frames, saturation grows roughly linearly
+    for fid, sat in enumerate([0.05, 0.20, 0.40, 0.65, 0.95]):
+        df = _palette([(50, 0, 0)], [1.0])
+        df["frame_id"] = f"f{fid}"
+        df["rgb_r"], df["rgb_g"], df["rgb_b"] = (
+            int(255 * sat + 128 * (1 - sat)),
+            int(128 * (1 - sat)),
+            int(128 * (1 - sat)),
+        )
+        rows.append(df)
+    pal = pd.concat(rows, ignore_index=True)
+    assert metrics.arc_shape(pal) == "rising"

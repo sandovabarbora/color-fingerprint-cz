@@ -1,37 +1,84 @@
-# Curated observations rendered into outputs/index.html.
-# Each entry: a one-line observation (with a specific number) + a one-line
-# interpretation. Keep both under ~50 words combined per the brief.
+# Patterns + conclusion rendered into outputs/index.html.
+#
+# Patterns are cross-cutting findings (not per-brand observations), each
+# backed by 2+ concrete brand examples and closing with a *strategic*
+# takeaway. The conclusion section answers "so what do we do with this".
 
-insights:
-  - obs: >-
-      AAA Auto's spot lives in 9% mean saturation and uses its brand
-      yellow on under 0.001% of screen-time.
-    interp: >-
-      The visual identity of the spot has been fully ceded to the
-      product — cars, dealerships, neutral gray. The logo carries the
-      brand; the picture is documentary.
+patterns:
+  - title: >-
+      Brand color and on-screen color are usually different colors.
+    evidence: >-
+      Across the corpus, the median gap between the brand's anchor hue and
+      the dominant on-screen hue is ~125°. Only two spots compress that
+      gap below 20°: McDonald's Sýrová sezóna (8°, the cheese is brand
+      yellow) and Kofola MéněVíce (11°, the world is cola brown). Mattoni
+      (167°), AAA Auto (159°) and T-Mobile Vánoce (153°) sit at the far
+      end — their pictures live somewhere a hue-wheel away from their
+      logos.
+    takeaway: >-
+      Brand color is a logo property; on-screen color is a world property.
+      Most brands accept the gap. Closing it (Sýrová sezóna's product
+      flood, Kofola's monothematic brown) is a deliberate creative move,
+      not a default — and only really works when the product itself is
+      the brand color.
 
-  - obs: >-
-      Two McDonald's spots, same yellow anchor, opposite roles for it —
-      48% of the screen in Sýrová sezóna, only 25% in Mc'n'Roll.
-    interp: >-
-      A product launch saturates with brand color; a music-video
-      collaboration steps back to let the artist's world set the
-      palette. Same brand, two completely different jobs for color.
+  - title: >-
+      Saturation tension is a category trait, not a creative choice.
+    evidence: >-
+      Banking (Fio std 0.05) and automotive (AAA std 0.04) flatten the
+      saturation arc — the spot lives at one register from start to
+      finish. Performative formats swing: Mc'n'Roll (0.20), Mattoni
+      (0.19), T-Mobile Vánoce (0.17) build by alternating dim and
+      bright. Two clusters, three-to-five-fold separation, almost no
+      overlap.
+    takeaway: >-
+      If your category sits at the low end, raising saturation tension
+      is a departure from genre — worth doing when the brief calls for
+      emotional storytelling, expensive when it doesn't. Decide which
+      side of the gap you want to live on, then stay there.
 
-  - obs: >-
-      Saturation tension (std) cleaves the corpus in two — Mc'n'Roll
-      (0.20) and Mattoni (0.19) at one end, Fio banka (0.05) and
-      AAA Auto (0.04) at the other.
-    interp: >-
-      Performative formats — music video, cinematic water mythology —
-      build by swinging between moody and bright. Corporate categories
-      flatten the curve and live at one saturation throughout.
+  - title: >-
+      The same brand can play color in opposite ways across spots.
+    evidence: >-
+      McDonald's Sýrová sezóna runs brand yellow on 48% of screen-time;
+      Mc'n'Roll on 25%. Same brand, same yellow, half the presence.
+      The first is a product-flood; the second cedes the picture to
+      Přemek Forejt's musical world and lets the logo carry the brand.
+    takeaway: >-
+      Brand color isn't a constant — it's a creative parameter. Decide
+      what *job* you want the brand color to do in each spot: heroic
+      background, or accent inside someone else's story. The two are
+      different jobs, even when the brief says "stay on brand."
 
-  - obs: >-
-      Mattoni's brand color is a flat blue (#0072CE), but only 1% of
-      its on-screen weight sits within ±15° of that hue.
-    interp: >-
-      The spot is full of turquoise water, which is roughly 30°
-      away from the brand swatch. The brand color and the product
-      color are different colors. A small but real strategic gap.
+  - title: >-
+      Holiday creative converges across categories.
+    evidence: >-
+      Penny, Vodafone, Pilsner, Kofola and T-Mobile — five categories,
+      five Vánoční spots — sit within a tight band of palette diversity
+      (14-24) and saturation tension (0.09-0.17), reaching for warm
+      reds and dim browns regardless of sector. Vánoce flattens sectoral
+      signatures.
+    takeaway: >-
+      A Christmas spot that looks distinctively yours requires active
+      resistance to the season's shared palette. The default move —
+      warm-red-and-candlelight — produces a spot that could belong to
+      a supermarket, a telco or a brewery interchangeably.
+
+conclusion:
+  - >-
+      Brand creative has at least three independent axes worth thinking
+      about: palette breadth (diversity), saturation tension, and brand-
+      color presence on screen. Most decks treat them as one ("vibrant"
+      vs "muted"). The data says they're independent — you can move on
+      any one of them without moving the others.
+  - >-
+      The most expressive spots in the corpus (Mc'n'Roll, Mattoni) score
+      high on diversity AND saturation tension AND have low brand-color
+      presence. The most disciplined (Fio banka, AAA Auto) flatten all
+      three. Production ambition and the three metrics co-vary — the
+      scatter map is a budget map as much as a creative one.
+  - >-
+      A measurable color brief beats a mood-board. "Diversity ~22,
+      saturation tension ~0.10, brand-color presence ~40%, arc shape:
+      peak" is a one-line spec any agency partner can deliver against.
+      Mood-boards leave the goalposts moveable; numbers don't.

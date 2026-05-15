@@ -47,6 +47,8 @@ def _tiny_campaigns() -> pd.DataFrame:
                 "sat_mean": 0.30,
                 "sat_std": 0.08,
                 "brand_anchor": 0.15,
+                "color_gap_deg": 30.0,
+                "arc_shape": "flat",
             },
             {
                 "brand_id": "brand_b",
@@ -58,6 +60,8 @@ def _tiny_campaigns() -> pd.DataFrame:
                 "sat_mean": 0.40,
                 "sat_std": 0.12,
                 "brand_anchor": 0.30,
+                "color_gap_deg": 120.0,
+                "arc_shape": "rising",
             },
         ]
     )

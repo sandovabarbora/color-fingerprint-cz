@@ -27,7 +27,7 @@
         <p class="name">
             <span class="swatch" style="background: {{ row.anchor_hex }};"></span>{{ row.brand }}
         </p>
-        <p class="sector">{{ row.sector }} · {{ row.n_frames }} frames</p>
+        <p class="sector">{{ row.sector }} · {{ row.n_frames }} frames · arc {{ row.arc_glyph }} {{ row.arc_shape }}</p>
     </div>
     {{ row.strip_html | safe }}
 </div>
@@ -35,17 +35,32 @@
 </section>
 
 <section>
-<h2>Cross-brand: palette diversity × saturation tension</h2>
+<h2>Cross-brand map: palette diversity vs saturation tension</h2>
 {{ scatter_svg | safe }}
+<p class="caption">Quadrants are split at the corpus median. Dot color = each brand's anchor swatch.</p>
 </section>
 
 <section>
-<h2>Observations</h2>
-{% for ins in insights %}
-<div class="insight">
-    <p class="obs">{{ ins.obs }}</p>
-    <p class="interp">{{ ins.interp }}</p>
+<h2>Brand color vs on-screen color</h2>
+<p class="lede-small">Distance (in degrees on the hue wheel) between the brand's anchor color and the dominant chromatic color actually on screen.</p>
+{{ gap_svg | safe }}
+</section>
+
+<section>
+<h2>Patterns</h2>
+{% for p in patterns %}
+<div class="pattern">
+    <h3>{{ p.title }}</h3>
+    <p class="evidence">{{ p.evidence }}</p>
+    <p class="takeaway"><strong>Why it matters.</strong> {{ p.takeaway }}</p>
 </div>
+{% endfor %}
+</section>
+
+<section>
+<h2>What this means</h2>
+{% for line in conclusion %}
+<p class="conclusion">{{ line }}</p>
 {% endfor %}
 </section>
 

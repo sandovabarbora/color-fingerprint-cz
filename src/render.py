@@ -39,6 +39,14 @@ logger = logging.getLogger(__name__)
 AUTHOR_NAME = "Barbora Šandová"
 REPO_URL = "https://github.com/sandovabarbora/color-fingerprint-cz"
 
+ARC_GLYPHS: dict[str, str] = {
+    "flat": "—",
+    "rising": "↗",
+    "falling": "↘",
+    "peak": "⌒",
+    "valley": "⌣",
+}
+
 
 # --- Color strip SVG -------------------------------------------------------
 
@@ -224,6 +232,33 @@ def build_scatter_svg(
         f'saturation tension (std) →</text>'
     )
 
+    # Median crosshair (quadrant split)
+    x_med = float(df["diversity"].median())
+    y_med = float(df["sat_std"].median())
+    x_med_px = x_to_px(x_med)
+    y_med_px = y_to_px(y_med)
+    parts.append(
+        f'<line x1="{x_med_px:.1f}" y1="{plot_t}" x2="{x_med_px:.1f}" y2="{plot_b}" '
+        f'stroke="#BBB" stroke-width="0.5" stroke-dasharray="3 3"/>'
+    )
+    parts.append(
+        f'<line x1="{plot_l}" y1="{y_med_px:.1f}" x2="{plot_r}" y2="{y_med_px:.1f}" '
+        f'stroke="#BBB" stroke-width="0.5" stroke-dasharray="3 3"/>'
+    )
+
+    # Quadrant labels at the four corners of the plot area
+    quad_labels = [
+        (plot_l + 6, plot_t + 12, "start", "Mood-piece"),
+        (plot_r - 6, plot_t + 12, "end", "Performative"),
+        (plot_l + 6, plot_b - 6, "start", "Corporate-flat"),
+        (plot_r - 6, plot_b - 6, "end", "Product-hero"),
+    ]
+    for tx, ty, anchor, label in quad_labels:
+        parts.append(
+            f'<text x="{tx}" y="{ty}" text-anchor="{anchor}" font-size="9.5" '
+            f'fill="#888" font-style="italic">{label}</text>'
+        )
+
     # Dots + labels
     for _, row in df.iterrows():
         px = x_to_px(float(row["diversity"]))
@@ -241,20 +276,91 @@ def build_scatter_svg(
     return "".join(parts)
 
 
+# --- Brand-color gap horizontal bars --------------------------------------
+
+
+def build_gap_svg(campaigns: pd.DataFrame, width: int = 720, row_h: int = 22) -> str:
+    """Horizontal bar chart of brand-color gap (degrees), sorted ascending.
+
+    Each bar is filled with the brand's anchor color so the reader can
+    see what swatch is "missing" from the picture. A reference tick at
+    90° marks the threshold beyond which the on-screen color is essentially
+    a different color from the brand color.
+    """
+    df = campaigns.dropna(subset=["color_gap_deg"]).copy()
+    if df.empty:
+        return ""
+    df = df.sort_values("color_gap_deg", ascending=True).reset_index(drop=True)
+    n = len(df)
+    label_w = 130
+    plot_l = label_w
+    plot_r = width - 40
+    value_w = plot_r - plot_l
+    height = row_h * n + 28  # +28 for axis label at top
+    max_deg = 180.0
+
+    parts: list[str] = [
+        f'<svg class="gap-chart" viewBox="0 0 {width} {height}" '
+        f'xmlns="http://www.w3.org/2000/svg">'
+    ]
+
+    # Axis ticks
+    for deg in (0, 45, 90, 135, 180):
+        x = plot_l + deg / max_deg * value_w
+        parts.append(
+            f'<line x1="{x:.1f}" y1="20" x2="{x:.1f}" y2="{height - 4}" '
+            f'stroke="#EEE" stroke-width="0.5"/>'
+        )
+        parts.append(
+            f'<text x="{x:.1f}" y="14" text-anchor="middle" font-size="10" '
+            f'fill="#777">{deg}°</text>'
+        )
+    # 90° reference: visual threshold for "different color"
+    x90 = plot_l + 90 / max_deg * value_w
+    parts.append(
+        f'<line x1="{x90:.1f}" y1="20" x2="{x90:.1f}" y2="{height - 4}" '
+        f'stroke="#AAA" stroke-width="0.6" stroke-dasharray="2 3"/>'
+    )
+
+    for i, row in df.iterrows():
+        y = 24 + i * row_h
+        gap = float(row["color_gap_deg"])
+        bar_w = gap / max_deg * value_w
+        parts.append(
+            f'<text x="{plot_l - 8}" y="{y + row_h * 0.65:.1f}" '
+            f'text-anchor="end" font-size="11" fill="#222">{row["brand"]}</text>'
+        )
+        parts.append(
+            f'<rect x="{plot_l}" y="{y}" width="{bar_w:.1f}" height="{row_h - 6}" '
+            f'fill="{row["anchor_hex"]}" stroke="#222" stroke-width="0.3"/>'
+        )
+        parts.append(
+            f'<text x="{plot_l + bar_w + 6:.1f}" y="{y + row_h * 0.65:.1f}" '
+            f'font-size="10" fill="#555">{gap:.0f}°</text>'
+        )
+    parts.append("</svg>")
+    return "".join(parts)
+
+
 # --- Insights --------------------------------------------------------------
 
 
-def load_insights(path: Path = config.PROJECT_ROOT / "config" / "insights.yaml") -> list[dict[str, str]]:
-    """Load curated insights from YAML, or return placeholders if missing."""
+def load_patterns_and_conclusion(
+    path: Path = config.PROJECT_ROOT / "config" / "insights.yaml",
+) -> tuple[list[dict[str, str]], list[str]]:
+    """Load patterns + conclusion strings from YAML.
+
+    Returns:
+        ``(patterns, conclusion)``. Patterns is a list of
+        ``{title, evidence, takeaway}`` dicts; conclusion is a list of
+        paragraph strings. Empty lists if the file is absent.
+    """
     if not path.exists():
-        return [
-            {
-                "obs": "Insights pending.",
-                "interp": "Edit config/insights.yaml to populate this section.",
-            }
-        ]
+        return ([], [])
     raw = yaml.safe_load(path.read_text(encoding="utf-8"))
-    return list(raw.get("insights", []))
+    patterns = list(raw.get("patterns", []))
+    conclusion = list(raw.get("conclusion", []))
+    return patterns, conclusion
 
 
 # --- Rendering -------------------------------------------------------------
@@ -274,6 +380,8 @@ def build_brand_rows(
                 "sector": c["sector"],
                 "anchor_hex": c["anchor_hex"],
                 "n_frames": int(c["n_frames"]),
+                "arc_shape": c.get("arc_shape", "flat"),
+                "arc_glyph": ARC_GLYPHS.get(c.get("arc_shape", "flat"), "—"),
                 "strip_html": build_strip_png(c["brand_id"], palettes),
             }
         )
@@ -295,13 +403,16 @@ def render_report(
         lstrip_blocks=True,
     )
     css = env.get_template("style.css.j2").render()
+    patterns, conclusion = load_patterns_and_conclusion()
     html = env.get_template("report.html.j2").render(
         inline_css=css,
         author=AUTHOR_NAME,
         repo_url=REPO_URL,
         brand_rows=build_brand_rows(campaigns, palettes),
         scatter_svg=build_scatter_svg(campaigns),
-        insights=load_insights(),
+        gap_svg=build_gap_svg(campaigns),
+        patterns=patterns,
+        conclusion=conclusion,
     )
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(html, encoding="utf-8")

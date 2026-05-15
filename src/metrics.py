@@ -30,6 +30,15 @@ import pandas as pd
 from src import config
 from src.fetch import BrandSpec, load_corpus
 
+# Threshold below which a cluster's hue is too noisy to count toward the
+# "dominant chromatic hue" — desaturated centroids (grays, browns at the
+# low end) have unstable hue and would dilute the signal.
+DOMINANT_HUE_SAT_MIN: float = 0.15
+
+# Arc-shape thresholds (operate on saturation in [0, 1])
+ARC_FLAT_RANGE: float = 0.10        # if max - min < this, classify 'flat'
+ARC_QUADRATIC_CURVATURE: float = 0.4  # |a| in y = a*t² + b*t + c with t in [0,1]
+
 logger = logging.getLogger(__name__)
 
 
@@ -141,6 +150,93 @@ def brand_anchor_share(
     return float(palettes["weight"].to_numpy(dtype=np.float64)[mask].sum() / total_weight)
 
 
+# --- Metric: dominant chromatic hue + brand-color gap ---------------------
+
+
+def dominant_chromatic_hue(palettes: pd.DataFrame) -> float | None:
+    """Saturation-weighted circular mean of hue across all clusters.
+
+    Desaturated centroids (s < ``DOMINANT_HUE_SAT_MIN``) are excluded
+    because their hue is numerically unstable and conceptually meaningless
+    (a near-gray pixel doesn't have a "color identity"). The remaining
+    chromatic centroids contribute as unit vectors on the hue circle
+    weighted by cluster_weight * saturation.
+
+    Args:
+        palettes: All palette rows for one brand.
+
+    Returns:
+        Mean hue in degrees [0, 360), or None if no centroid passes the
+        saturation gate (i.e. the brand's whole spot is achromatic).
+    """
+    rgb = palettes[["rgb_r", "rgb_g", "rgb_b"]].to_numpy() / 255.0
+    hsv = np.array([colorsys.rgb_to_hsv(r, g, b) for r, g, b in rgb])
+    hues_deg = hsv[:, 0] * 360.0
+    sats = hsv[:, 1]
+    weights = palettes["weight"].to_numpy(dtype=np.float64) * sats
+    mask = sats >= DOMINANT_HUE_SAT_MIN
+    if not mask.any() or weights[mask].sum() == 0:
+        return None
+    angles = np.deg2rad(hues_deg[mask])
+    w = weights[mask]
+    x = float((w * np.cos(angles)).sum())
+    y = float((w * np.sin(angles)).sum())
+    mean = np.rad2deg(np.arctan2(y, x))
+    return float(mean % 360.0)
+
+
+def brand_color_gap_deg(palettes: pd.DataFrame, anchor_hex: str) -> float | None:
+    """Circular distance between dominant chromatic hue and anchor hue.
+
+    Returns:
+        Gap in degrees [0, 180], or None if the spot has no chromatic
+        identity (entirely achromatic).
+    """
+    dominant = dominant_chromatic_hue(palettes)
+    if dominant is None:
+        return None
+    anchor_hue = _rgb01_to_hue_deg(_hex_to_rgb01(anchor_hex))
+    return _hue_circular_distance(dominant, anchor_hue)
+
+
+# --- Metric: saturation arc shape -----------------------------------------
+
+
+def arc_shape(palettes: pd.DataFrame) -> str:
+    """Classify the saturation trajectory shape of one brand's spot.
+
+    Procedure:
+      1. Per-frame cluster-weighted saturation → time series.
+      2. If max-min < ARC_FLAT_RANGE → 'flat'.
+      3. Otherwise fit a quadratic y = a·t² + b·t + c (t normalized to
+         [0, 1]) and inspect curvature plus apex position:
+         - |a| ≥ ARC_QUADRATIC_CURVATURE with apex in [0.2, 0.8]:
+           a < 0 → 'peak' (inverted U), a > 0 → 'valley' (U).
+         - Otherwise fall back to linear slope sign → 'rising' / 'falling'.
+
+    Returns:
+        One of {'flat', 'rising', 'falling', 'peak', 'valley'}.
+    """
+    frame_ids = sorted(palettes["frame_id"].unique())
+    if len(frame_ids) < 3:
+        return "flat"
+    sats = np.array(
+        [frame_saturation(palettes[palettes["frame_id"] == fid]) for fid in frame_ids],
+        dtype=np.float64,
+    )
+    if float(sats.max() - sats.min()) < ARC_FLAT_RANGE:
+        return "flat"
+    t = np.linspace(0.0, 1.0, len(sats))
+    a, b, _c = np.polyfit(t, sats, 2)
+    if abs(a) >= ARC_QUADRATIC_CURVATURE:
+        # apex of y = a*t² + b*t + c is at t = -b / (2a)
+        apex = -b / (2 * a)
+        if 0.2 <= apex <= 0.8:
+            return "peak" if a < 0 else "valley"
+    slope = float(np.polyfit(t, sats, 1)[0])
+    return "rising" if slope > 0 else "falling"
+
+
 # --- Aggregation -----------------------------------------------------------
 
 
@@ -171,6 +267,8 @@ def compute_brand_metrics(
     sat_mean = float(np.mean(per_frame_saturation)) if per_frame_saturation else 0.0
     sat_std = float(np.std(per_frame_saturation)) if per_frame_saturation else 0.0
     anchor = brand_anchor_share(palettes, spec.anchor_hex)
+    color_gap = brand_color_gap_deg(palettes, spec.anchor_hex)
+    shape = arc_shape(palettes)
 
     return {
         "brand_id": brand_id,
@@ -182,6 +280,8 @@ def compute_brand_metrics(
         "sat_mean": sat_mean,
         "sat_std": sat_std,
         "brand_anchor": anchor,
+        "color_gap_deg": float(color_gap) if color_gap is not None else float("nan"),
+        "arc_shape": shape,
     }
 
 
@@ -201,12 +301,14 @@ def compute_all(specs: list[BrandSpec], palettes: pd.DataFrame) -> pd.DataFrame:
         row = compute_brand_metrics(spec.id, spec, sub)
         rows.append(row)
         logger.info(
-            "[%s] diversity=%.1f sat_mean=%.3f sat_std=%.3f anchor_share=%.3f n_frames=%d",
+            "[%s] div=%.1f sat=%.2f/%.2f anchor=%.2f gap=%s shape=%s n=%d",
             spec.id,
             row["diversity"],
             row["sat_mean"],
             row["sat_std"],
             row["brand_anchor"],
+            f"{row['color_gap_deg']:.1f}°" if not np.isnan(row["color_gap_deg"]) else "n/a",
+            row["arc_shape"],
             row["n_frames"],
         )
     return pd.DataFrame(rows)
