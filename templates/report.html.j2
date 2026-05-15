@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Color Fingerprint of Czech Advertising</title>
+<title>Brand color or world color: a field study of Czech TV advertising</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <style>{{ inline_css }}</style>
@@ -13,19 +13,32 @@
 
 <header class="masthead">
     <p class="eyebrow">A field study, 2026</p>
-    <h1>Color Fingerprint of Czech Advertising</h1>
-    <p class="lede">Ten publicly available spots, sampled at one frame per second, clustered in CIE&#8209;LAB color space; the picture that emerges, and the moves it suggests.</p>
+    <h1>Brand color, or world color?</h1>
+    <p class="lede">A spot's picture either commits to the brand color or commits to a world. Eight of ten Czech TV spots do the latter; few realize they are choosing.</p>
     <p class="byline">By {{ author }}. <a href="{{ repo_url }}">Source on GitHub</a>.</p>
 </header>
 
 <section class="method">
     <p class="method-label">Method</p>
-    <p class="method-body">Frames sampled at one per second from public uploads. Per&#8209;frame palettes via K&#8209;means (k = 5) in canonical CIE&#8209;LAB, where Euclidean distance approximates perceptual color difference. Brand metrics aggregate across all retained frames of each spot.</p>
+    <p class="method-body">Ten publicly available Czech TV spots, sampled at one frame per second. Per-frame palettes via K-means (k = 5) in canonical CIE-LAB. For each spot we compute its dominant chromatic hue, the brand's anchor hue, and the circular distance between them. We then ask which camp the spot belongs to.</p>
 </section>
 
 <section>
-    <div class="section-label"><span class="num">01</span><h2>Per-brand color strips</h2></div>
-    <p class="section-intro">Each spot becomes a contact sheet: every frame a vertical column, every column split top to bottom by the K&#8209;means cluster sizes. Dominant colors fill more space; accents stay narrow.</p>
+    <div class="section-label"><span class="num">01</span><h2>The split</h2></div>
+    <p class="section-intro">Distance, in degrees on the hue wheel, between each brand's anchor swatch and the dominant chromatic color the spot actually puts on screen. Bars are filled with the swatch; the dashed reference at 90&deg; marks the perceptual threshold beyond which the two are, effectively, different colors. Two spots sit below 20&deg;. Seven sit above 100&deg;. One brand straddles.</p>
+    <figure class="gap-frame">
+        {{ gap_svg | safe }}
+    </figure>
+</section>
+
+<aside class="pull">
+    <p class="pull-q">AAA Auto's brand yellow occupies <span class="num">0.001%</span> of screen-time.</p>
+    <p class="pull-cap">A logo carries the brand identity. The picture commits to a different world: dim grays, neutral browns, the visual register of a used-car catalog. Both signals can coexist; rarely is the split deliberate.</p>
+</aside>
+
+<section>
+    <div class="section-label"><span class="num">02</span><h2>The two camps, on screen</h2></div>
+    <p class="section-intro">Each spot reads as a contact sheet: every frame a vertical column, every column split top to bottom by K-means cluster sizes. Strips are ordered by their distance from brand color, so the page reads brand-led at the top, world-led at the bottom. A saturation sparkline sits below each brand name; the arc glyph summarizes its shape.</p>
     <div class="strips-list">
 {% for row in brand_rows %}
     <div class="brand-row">
@@ -41,35 +54,8 @@
 </section>
 
 <section>
-    <div class="section-label"><span class="num">02</span><h2>Diversity meets saturation tension</h2></div>
-    <p class="section-intro">Two independent axes. Quadrants split at the corpus median. Dot color reads each brand's anchor swatch.</p>
-    <figure class="scatter-frame">
-        {{ scatter_svg | safe }}
-        <figcaption class="scatter-cap">Palette diversity (x) vs saturation std across frames (y).</figcaption>
-    </figure>
-    <div class="sector-ci-block">
-        <p class="ci-eyebrow">Sector means with 95% bootstrap CI on saturation std</p>
-        {{ sector_ci_svg | safe }}
-        <p class="ci-note">Bootstrap resamples brand-level values within each sector. With two to three brands per sector the intervals are wide; the gap between corporate (banking, automotive) and performative sectors is still visible.</p>
-    </div>
-</section>
-
-<aside class="pull">
-    <p class="pull-q">AAA Auto's yellow occupies <span class="num">0.001%</span> of screen-time.</p>
-    <p class="pull-cap">Their brand color is a saturated logo yellow; their picture is a dim gray catalog of cars and dealerships. The logo carries the brand. The picture does not.</p>
-</aside>
-
-<section>
-    <div class="section-label"><span class="num">03</span><h2>Brand color, on-screen color</h2></div>
-    <p class="section-intro">Distance, in degrees on the hue wheel, between each brand's anchor swatch and the dominant chromatic color the spot actually puts on screen. Bars fill the swatch; reference at 90&deg; marks the threshold beyond which the two are, perceptually, different colors.</p>
-    <figure class="gap-frame">
-        {{ gap_svg | safe }}
-    </figure>
-</section>
-
-<section>
-    <div class="section-label"><span class="num">04</span><h2>Where each spot's color mass lives</h2></div>
-    <p class="section-intro">A polar histogram per spot. Angle on the wheel is hue (0&deg; red, 120&deg; green, 240&deg; blue); radial length is saturation-weighted density. The tick on the rim marks each brand's anchor hue, in anchor color, so the gap between brand and picture is visible at a glance.</p>
+    <div class="section-label"><span class="num">03</span><h2>Where each spot's color mass lives</h2></div>
+    <p class="section-intro">Per-spot polar histograms. Angle is hue (0&deg; red, 120&deg; green, 240&deg; blue); radial length is saturation-weighted density. The tick on the rim, in anchor color, marks each brand's logo swatch. In two cases the tick aligns with the spot's color mass. In the rest, the tick is somewhere the picture barely visits.</p>
     <div class="radial-grid">
 {% for row in brand_rows %}
     <figure class="radial-cell">
@@ -81,12 +67,26 @@
 </section>
 
 <section>
-    <div class="section-label"><span class="num">05</span><h2>Brand similarity, structurally</h2></div>
-    <p class="section-intro">Hierarchical clustering on the pairwise Sz&eacute;kely energy distance between every pair of brands' weighted LAB palettes (UPGMA linkage). Spots that join low on the x-axis share a color signature, regardless of sector.</p>
+    <div class="section-label"><span class="num">04</span><h2>The split is structural, not sectoral</h2></div>
+    <p class="section-intro">Hierarchical clustering on pairwise Sz&eacute;kely energy distance between every pair of brands' weighted LAB palettes. If the brand-vs-world split were just a sector artifact, brands from the same sector would cluster tightly. They do not. McDonald's two spots sit close to each other; everyone else clusters across sector boundaries, by their color signature.</p>
     <figure class="dendrogram-frame">
         {{ dendrogram_svg | safe }}
-        <figcaption class="scatter-cap">Energy distance is a kernel-based statistical distance; lower means more similar full-palette distributions.</figcaption>
+        <figcaption class="scatter-cap">Energy distance is a kernel-based statistical distance on weighted point clouds; lower means more similar full-palette distributions.</figcaption>
     </figure>
+</section>
+
+<section>
+    <div class="section-label"><span class="num">05</span><h2>The category effect, supporting</h2></div>
+    <p class="section-intro">Saturation tension (the std of per-frame saturation across the spot) splits the corpus by category too. Banking and automotive flatten; performative formats swing. This is a related but distinct axis from the brand-vs-world split; both shape the spot.</p>
+    <figure class="scatter-frame">
+        {{ scatter_svg | safe }}
+        <figcaption class="scatter-cap">Palette diversity (x) vs saturation std across frames (y). Quadrants at corpus medians.</figcaption>
+    </figure>
+    <div class="sector-ci-block">
+        <p class="ci-eyebrow">Sector means with 95% bootstrap CI on saturation std</p>
+        {{ sector_ci_svg | safe }}
+        <p class="ci-note">Bootstrap resamples brand-level values within each sector. With two to three brands per sector the intervals are wide; the gap between corporate (banking, automotive) and performative sectors is still visible.</p>
+    </div>
 </section>
 
 <section>

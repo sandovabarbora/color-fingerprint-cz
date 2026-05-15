@@ -751,8 +751,10 @@ def build_brand_rows(
 ) -> list[dict[str, Any]]:
     """Build the per-brand row data passed to the template."""
     rows: list[dict[str, Any]] = []
-    # Order by diversity desc — biggest stories first, dampest last
-    for _, c in campaigns.sort_values("diversity", ascending=False).iterrows():
+    # Order by brand-color-gap ascending: brand-led spots first
+    # (the camp that compresses the gap), then world-led spots. This
+    # makes the page's central thesis visible as you scroll the strips.
+    for _, c in campaigns.sort_values("color_gap_deg", ascending=True).iterrows():
         rows.append(
             {
                 "brand_id": c["brand_id"],
