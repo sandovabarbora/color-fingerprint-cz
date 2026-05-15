@@ -1,218 +1,461 @@
-/* All styling is inlined into report.html.j2 — system fonts, no JS, no assets. */
+/*
+ * Editorial film-still register. Bodoni Moda for display + numerals,
+ * Manrope for body. OKLCH neutrals with a single saturated accent.
+ * Asymmetric grid; varied rhythm; numbered sections as the visual motif.
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,11..96,400..900;1,11..96,400..900&family=Manrope:wght@400;500;600;700&display=swap');
 
 :root {
-    --bg: #FAFAF7;
-    --ink: #181818;
-    --ink-soft: #555;
-    --rule: #DCD8D0;
-    --accent: #181818;
-    --strip-h: 64px;
+    --paper:     oklch(0.985 0.005 80);
+    --ink:       oklch(0.18  0.01  80);
+    --ink-soft:  oklch(0.45  0.01  80);
+    --ink-faint: oklch(0.65  0.008 80);
+    --rule:      oklch(0.88  0.008 80);
+    --rule-soft: oklch(0.94  0.005 80);
+    --accent:    oklch(0.46  0.16  25);
+    --serif: "Bodoni Moda", "Times New Roman", serif;
+    --sans:  "Manrope", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
-* {
-    box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 html, body {
     margin: 0;
     padding: 0;
-    background: var(--bg);
+    background: var(--paper);
     color: var(--ink);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-        "Helvetica Neue", Arial, sans-serif;
-    font-size: 15px;
+    font-family: var(--sans);
+    font-size: 16px;
     line-height: 1.55;
     -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
 }
 
 main {
-    max-width: 880px;
+    max-width: 1080px;
     margin: 0 auto;
-    padding: 56px 24px 96px;
+    padding: clamp(40px, 6vw, 88px) clamp(20px, 4vw, 56px) 96px;
 }
 
-header h1 {
-    font-size: 28px;
+/* ============ Header ============ */
+
+.masthead {
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: clamp(32px, 4vw, 48px);
+    margin-bottom: clamp(56px, 6vw, 88px);
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+}
+
+.eyebrow {
+    font-family: var(--sans);
+    font-size: 11px;
     font-weight: 600;
-    letter-spacing: -0.01em;
-    margin: 0 0 6px 0;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin: 0 0 4px;
 }
 
-header .lede {
-    margin: 0 0 4px 0;
-    color: var(--ink-soft);
-    font-size: 16px;
+.masthead h1 {
+    font-family: var(--serif);
+    font-weight: 800;
+    font-style: italic;
+    font-optical-sizing: auto;
+    font-size: clamp(40px, 7vw, 84px);
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    margin: 0;
+    color: var(--ink);
 }
 
-header .byline {
-    margin: 0 0 40px 0;
+.masthead .lede {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(18px, 2vw, 22px);
+    line-height: 1.4;
     color: var(--ink-soft);
+    max-width: 56ch;
+    margin: 0;
+}
+
+.masthead .byline {
     font-size: 13px;
+    color: var(--ink-soft);
+    letter-spacing: 0.04em;
+    margin: 0;
 }
 
-header .byline a {
-    color: var(--ink-soft);
-    text-decoration: underline;
-    text-decoration-color: var(--rule);
-    text-underline-offset: 2px;
+.masthead .byline a {
+    color: var(--ink);
+    text-decoration: none;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 1px;
 }
+
+.masthead .byline a:hover {
+    border-bottom-color: var(--accent);
+    color: var(--accent);
+}
+
+/* ============ Section labels ============ */
+
+.section-label {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin: clamp(64px, 7vw, 96px) 0 clamp(28px, 3vw, 40px);
+}
+
+.section-label .num {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(20px, 2vw, 24px);
+    color: var(--accent);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+}
+
+.section-label h2 {
+    font-family: var(--serif);
+    font-weight: 700;
+    font-size: clamp(22px, 2.4vw, 30px);
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    margin: 0;
+    color: var(--ink);
+}
+
+.section-intro {
+    color: var(--ink-soft);
+    font-size: 14px;
+    max-width: 56ch;
+    margin: -8px 0 32px;
+    line-height: 1.6;
+}
+
+/* ============ Method block ============ */
 
 .method {
-    border-top: 1px solid var(--rule);
-    border-bottom: 1px solid var(--rule);
-    padding: 16px 0;
-    margin: 0 0 40px;
-    color: var(--ink-soft);
-    font-size: 13px;
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: clamp(20px, 3vw, 40px);
+    align-items: start;
+    margin-bottom: clamp(56px, 7vw, 88px);
 }
 
-.method strong {
-    color: var(--ink);
+.method-label {
+    font-family: var(--sans);
+    font-size: 11px;
     font-weight: 600;
-}
-
-h2 {
-    font-size: 13px;
-    font-weight: 600;
+    letter-spacing: 0.16em;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
-    margin: 48px 0 16px;
     color: var(--ink-soft);
+    padding-top: 6px;
+}
+
+.method-body {
+    font-family: var(--serif);
+    font-size: clamp(15px, 1.4vw, 17px);
+    line-height: 1.55;
+    color: var(--ink);
+    margin: 0;
+    max-width: 60ch;
+}
+
+/* ============ Per-brand strips ============ */
+
+.strips-list {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    margin-bottom: clamp(48px, 6vw, 80px);
 }
 
 .brand-row {
     display: grid;
-    grid-template-columns: 180px 1fr;
-    gap: 24px;
+    grid-template-columns: minmax(160px, 220px) 1fr;
+    gap: clamp(20px, 3vw, 40px);
     align-items: center;
-    margin-bottom: 18px;
 }
 
 .brand-meta .name {
+    font-family: var(--serif);
     font-weight: 600;
-    font-size: 15px;
-    margin: 0;
+    font-size: clamp(17px, 1.7vw, 21px);
+    margin: 0 0 4px;
+    line-height: 1.15;
+    letter-spacing: -0.005em;
 }
 
 .brand-meta .sector {
-    font-size: 12px;
+    font-family: var(--sans);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
     color: var(--ink-soft);
-    margin: 2px 0 0;
+    margin: 0;
 }
 
 .brand-meta .swatch {
     display: inline-block;
-    width: 9px;
-    height: 9px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
     vertical-align: middle;
-    margin-right: 6px;
-    border: 1px solid var(--rule);
+    margin-right: 8px;
+    transform: translateY(-1px);
 }
 
 .strip {
     display: block;
     width: 100%;
-    height: var(--strip-h);
+    height: 68px;
+}
+
+/* ============ Pull-quote ============ */
+
+.pull {
+    margin: clamp(40px, 5vw, 64px) 0;
+    padding: clamp(28px, 4vw, 48px) 0;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+}
+
+.pull-q {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-style: italic;
+    font-size: clamp(24px, 3.4vw, 40px);
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+    color: var(--ink);
+    margin: 0;
+    max-width: 22ch;
+}
+
+.pull-q .num {
+    color: var(--accent);
+    font-style: normal;
+    font-weight: 700;
+}
+
+.pull-cap {
+    font-family: var(--sans);
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    color: var(--ink-soft);
+    margin: 0;
+    max-width: 48ch;
+}
+
+/* ============ Scatter ============ */
+
+.scatter-frame {
+    margin: 0 auto clamp(8px, 1vw, 12px);
+    max-width: 620px;
 }
 
 .scatter {
     display: block;
     width: 100%;
-    max-width: 540px;
-    margin: 8px auto 0;
 }
 
-.pattern {
-    margin: 0 0 28px;
+.scatter-cap {
+    text-align: center;
+    color: var(--ink-soft);
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    margin: 8px 0 0;
+    font-family: var(--sans);
+}
+
+/* ============ Gap chart ============ */
+
+.gap-frame {
+    margin: 0 0 clamp(40px, 5vw, 64px);
+}
+
+.gap-chart {
+    display: block;
+    width: 100%;
     max-width: 760px;
 }
 
+/* ============ Patterns ============ */
+
+.patterns {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: clamp(40px, 5vw, 72px);
+    margin-bottom: clamp(48px, 6vw, 80px);
+}
+
+.pattern {
+    display: grid;
+    grid-template-columns: clamp(72px, 8vw, 108px) 1fr;
+    gap: clamp(20px, 3vw, 40px);
+    align-items: start;
+}
+
+.pattern .num {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(52px, 6vw, 80px);
+    line-height: 0.85;
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+    margin: 0;
+}
+
 .pattern h3 {
-    font-size: 15px;
-    font-weight: 600;
-    margin: 0 0 8px;
-    line-height: 1.4;
+    font-family: var(--serif);
+    font-weight: 700;
+    font-size: clamp(20px, 2vw, 26px);
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    margin: 0 0 16px;
+    color: var(--ink);
+    max-width: 28ch;
 }
 
 .pattern .evidence {
-    margin: 0 0 8px;
+    margin: 0 0 16px;
+    font-size: 15px;
+    line-height: 1.6;
     color: var(--ink);
-    font-size: 14px;
+    max-width: 60ch;
 }
 
 .pattern .takeaway {
     margin: 0;
-    color: var(--ink-soft);
     font-size: 14px;
-    border-left: 2px solid var(--rule);
-    padding-left: 14px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    max-width: 60ch;
 }
 
 .pattern .takeaway strong {
     color: var(--ink);
     font-weight: 600;
+    letter-spacing: 0.02em;
+    font-size: 11px;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 4px;
+}
+
+/* ============ Playbook ============ */
+
+.playbook {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: clamp(28px, 3vw, 40px);
+    margin-bottom: clamp(48px, 6vw, 72px);
 }
 
 .play {
-    max-width: 760px;
-    margin: 0 0 22px;
+    display: grid;
+    grid-template-columns: clamp(64px, 7vw, 88px) 1fr;
+    gap: clamp(20px, 3vw, 40px);
+    align-items: baseline;
+    padding-bottom: clamp(24px, 3vw, 32px);
+    border-bottom: 1px solid var(--rule-soft);
 }
 
-.play h3 {
-    font-size: 15px;
-    font-weight: 600;
-    margin: 0 0 6px;
-    line-height: 1.4;
-    display: flex;
-    gap: 10px;
+.play:last-child {
+    border-bottom: none;
 }
 
 .play .play-num {
-    color: var(--ink-soft);
+    font-family: var(--serif);
+    font-style: italic;
     font-weight: 400;
-    flex-shrink: 0;
+    font-size: clamp(36px, 4.5vw, 56px);
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    margin: 0;
+}
+
+.play h3 {
+    font-family: var(--serif);
+    font-weight: 700;
+    font-style: italic;
+    font-size: clamp(19px, 1.8vw, 24px);
+    line-height: 1.25;
+    letter-spacing: -0.005em;
+    margin: 0 0 12px;
+    color: var(--ink);
+    max-width: 28ch;
 }
 
 .play .play-body {
     margin: 0;
     color: var(--ink-soft);
     font-size: 14px;
-    padding-left: 26px;
+    line-height: 1.6;
+    max-width: 60ch;
 }
 
-.caption {
-    color: var(--ink-soft);
-    font-size: 12px;
-    margin: 8px 0 0;
-    text-align: center;
-}
-
-.lede-small {
-    color: var(--ink-soft);
-    font-size: 13px;
-    margin: 0 0 12px;
-}
-
-.gap-chart {
-    display: block;
-    width: 100%;
-    max-width: 720px;
-    margin: 0 auto;
-}
+/* ============ Colophon ============ */
 
 footer {
-    margin-top: 64px;
-    padding-top: 20px;
+    margin-top: clamp(64px, 8vw, 96px);
+    padding-top: 32px;
     border-top: 1px solid var(--rule);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 32px;
     color: var(--ink-soft);
     font-size: 12px;
+    line-height: 1.55;
 }
 
-footer p {
-    margin: 0 0 6px;
+footer h4 {
+    font-family: var(--sans);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    margin: 0 0 8px;
+    color: var(--ink);
 }
 
-footer a {
-    color: var(--ink-soft);
+footer p { margin: 0 0 6px; }
+footer a { color: var(--ink-soft); text-decoration: underline; text-decoration-color: var(--rule); text-underline-offset: 2px; }
+footer a:hover { color: var(--accent); }
+
+/* ============ Responsive ============ */
+
+@media (max-width: 640px) {
+    .method,
+    .brand-row,
+    .pattern,
+    .play {
+        grid-template-columns: 1fr;
+    }
+    .method-label {
+        padding-top: 0;
+    }
+    .pattern .num,
+    .play .play-num {
+        font-size: 40px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
 }

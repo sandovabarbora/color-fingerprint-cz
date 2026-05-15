@@ -18,11 +18,11 @@ notebook:
 - **Real pipeline, not a one-off script.** Each stage (`fetch / extract /
   color / metrics / render`) is an independent, idempotent module with type
   hints, structured logging, and tests on the critical path.
-- **Honest about its tradeoffs.** Every interpretive choice — sampling rate,
-  color space, anchor definition, sample size — is documented in the
+- **Honest about its tradeoffs.** Every interpretive choice (sampling rate,
+  color space, anchor definition, sample size) is documented in the
   Limitations section below.
 - **Speaks the language of creative.** The output is a minimalist HTML
-  report designed to be read, not just dashboarded — color strips that look
+  report designed to be read, not just dashboarded: color strips that look
   like contact sheets, a scatter you can read in three seconds.
 
 ---
@@ -68,15 +68,15 @@ make test             # pytest
 3. **Color.** Each frame is downsampled to ≤200px edge, converted to
    canonical CIE-LAB (where Euclidean distance approximates perceptual
    difference), and clustered with `KMeans(k=5, random_state=42)`. Near-
-   black frames (mean L < 7.84) are skipped — K-means on uniform-dark
+   black frames (mean L < 7.84) are skipped: K-means on uniform-dark
    pixel clouds collapses centroids and produces noise.
 
 4. **Metrics.** Three per-brand aggregates:
-   - **Palette diversity** — expected pairwise LAB distance between two
+   - **Palette diversity.** Expected pairwise LAB distance between two
      pixels sampled by cluster prevalence (`Σwᵢwⱼ‖cᵢ-cⱼ‖`).
-   - **Saturation arc** — cluster-weighted HSV saturation per frame, then
+   - **Saturation arc.** Cluster-weighted HSV saturation per frame, then
      mean and std across frames. The std captures the spot's "tension".
-   - **Brand anchor** — fraction of total cluster weight whose hue is
+   - **Brand anchor.** Fraction of total cluster weight whose hue is
      within ±15° of the brand's anchor color (circular hue distance).
 
 5. **Render.** A single static HTML page with inline CSS, no JavaScript, no

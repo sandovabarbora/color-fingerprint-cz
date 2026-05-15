@@ -1,39 +1,40 @@
-# Patterns + conclusion rendered into outputs/index.html.
+# Patterns + playbook rendered into outputs/index.html.
 #
 # Patterns are cross-cutting findings (not per-brand observations), each
-# backed by 2+ concrete brand examples and closing with a *strategic*
-# takeaway. The conclusion section answers "so what do we do with this".
+# backed by 2+ concrete brand examples and closing with a strategic
+# takeaway. The playbook is the so-what: five concrete moves a
+# strategist or creative director can run on next week's pitch.
 
 patterns:
   - title: >-
       Brand color and on-screen color are usually different colors.
     evidence: >-
       Across the corpus, the median gap between the brand's anchor hue and
-      the dominant on-screen hue is ~125°. Only two spots compress that
-      gap below 20°: McDonald's Sýrová sezóna (8°, the cheese is brand
-      yellow) and Kofola MéněVíce (11°, the world is cola brown). Mattoni
-      (167°), AAA Auto (159°) and T-Mobile Vánoce (153°) sit at the far
-      end — their pictures live somewhere a hue-wheel away from their
-      logos.
+      the dominant on-screen hue sits near 125&deg;. Only two spots compress
+      that gap below 20&deg;: McDonald's Sýrová sezóna (8&deg;, the cheese
+      is brand yellow) and Kofola MéněVíce (11&deg;, the world is cola
+      brown). Mattoni (167&deg;), AAA Auto (159&deg;) and T-Mobile Vánoce
+      (153&deg;) sit at the far end. Their pictures live somewhere a
+      hue-wheel away from their logos.
     takeaway: >-
-      Brand color is a logo property; on-screen color is a world property.
+      Brand color is a logo property, on-screen color is a world property.
       Most brands accept the gap. Closing it (Sýrová sezóna's product
       flood, Kofola's monothematic brown) is a deliberate creative move,
-      not a default — and only really works when the product itself is
-      the brand color.
+      not a default, and only really works when the product itself is the
+      brand color.
 
   - title: >-
       Saturation tension is a category trait, not a creative choice.
     evidence: >-
       Banking (Fio std 0.05) and automotive (AAA std 0.04) flatten the
-      saturation arc — the spot lives at one register from start to
+      saturation arc; the spot lives at one register from start to
       finish. Performative formats swing: Mc'n'Roll (0.20), Mattoni
       (0.19), T-Mobile Vánoce (0.17) build by alternating dim and
-      bright. Two clusters, three-to-five-fold separation, almost no
+      bright. Two clusters, three- to five-fold separation, almost no
       overlap.
     takeaway: >-
-      If your category sits at the low end, raising saturation tension
-      is a departure from genre — worth doing when the brief calls for
+      If your category sits at the low end, raising saturation tension is
+      a departure from genre, worth doing when the brief calls for
       emotional storytelling, expensive when it doesn't. Decide which
       side of the gap you want to live on, then stay there.
 
@@ -42,43 +43,43 @@ patterns:
     evidence: >-
       McDonald's Sýrová sezóna runs brand yellow on 48% of screen-time;
       Mc'n'Roll on 25%. Same brand, same yellow, half the presence.
-      The first is a product-flood; the second cedes the picture to
+      The first is a product flood. The second cedes the picture to
       Přemek Forejt's musical world and lets the logo carry the brand.
     takeaway: >-
-      Brand color isn't a constant — it's a creative parameter. Decide
-      what *job* you want the brand color to do in each spot: heroic
-      background, or accent inside someone else's story. The two are
-      different jobs, even when the brief says "stay on brand."
+      Brand color is not a constant. It is a creative parameter. Decide
+      what job you want it to do in each spot: heroic background, or
+      accent inside someone else's story. The two are different jobs,
+      even when the brief says "stay on brand."
 
   - title: >-
       Holiday creative converges across categories.
     evidence: >-
-      Penny, Vodafone, Pilsner, Kofola and T-Mobile — five categories,
-      five Vánoční spots — sit within a tight band of palette diversity
-      (14-24) and saturation tension (0.09-0.17), reaching for warm
-      reds and dim browns regardless of sector. Vánoce flattens sectoral
-      signatures.
+      Penny, Vodafone, Pilsner, Kofola and T-Mobile, five categories with
+      five Vánoční spots, sit within a tight band of palette diversity
+      (14 to 24) and saturation tension (0.09 to 0.17), reaching for
+      warm reds and dim browns regardless of sector. Vánoce flattens
+      sectoral signatures.
     takeaway: >-
       A Christmas spot that looks distinctively yours requires active
-      resistance to the season's shared palette. The default move —
-      warm-red-and-candlelight — produces a spot that could belong to
-      a supermarket, a telco or a brewery interchangeably.
+      resistance to the season's shared palette. The default move,
+      warm-red-and-candlelight, produces a spot that could belong to a
+      supermarket, a telco or a brewery interchangeably.
 
 playbook:
   - title: >-
       Set numerical color targets before the creative review, not after.
     body: >-
-      When scoping a new spot, agree with the client on target ranges
-      for each axis — e.g. diversity ~22, saturation tension ~0.10,
-      brand-color presence ~40%, arc shape: peak. The corpus here is a
-      starter benchmark. This catches "make it more on-brand" arguments
-      in the brief stage, before they cost a re-shoot in post.
+      When scoping a new spot, agree with the client on target ranges for
+      each axis. Say diversity around 22, saturation tension around 0.10,
+      brand-color presence around 40%, arc shape: peak. The corpus here
+      is a starter benchmark. This catches "make it more on-brand"
+      arguments in the brief stage, before they cost a re-shoot in post.
 
   - title: >-
       Run the same analysis on the client's competitive set during pitch.
     body: >-
-      Show them where their category currently sits on the diversity ×
-      tension map. Then say where their spot will land — and where the
+      Show them where their category currently sits on the diversity by
+      tension map. Then say where their spot will land, and where the
       next three competitors land. Distinctiveness becomes a coordinate,
       not a vibe. Especially useful with categories where every brand
       looks the same (banking, telco, automotive).
@@ -86,26 +87,26 @@ playbook:
   - title: >-
       Use the brand-color gap as a diagnostic, not a goal.
     body: >-
-      If a brand's on-screen color is 120° away from its logo, that's
-      usually fine — picture and logo do different jobs. Closing the gap
-      (Sýrová sezóna's 8°, Kofola's 11°) is a deliberate creative move
-      that only makes sense when the product itself is the brand color.
-      Stop framing brand presence as "more is better"; frame it as
-      "what's the right amount for THIS spot's job."
+      If a brand's on-screen color is 120&deg; away from its logo, that
+      is usually fine. Picture and logo do different jobs. Closing the
+      gap (Sýrová sezóna's 8&deg;, Kofola's 11&deg;) is a deliberate
+      creative move that only makes sense when the product itself is
+      the brand color. Stop framing brand presence as "more is better";
+      frame it as "what's the right amount for THIS spot's job."
 
   - title: >-
       Treat the Vánoce cluster as a warning, not a destination.
     body: >-
-      Five Vánoční spots from five sectors land in the same patch of the
-      map. If you're pitching seasonal creative, decide explicitly: do
-      you want to be in the comfort zone or visibly outside it? Either
-      is fine; landing inside accidentally is not. Same logic applies
-      to any genre cluster — sport, premium-image, family.
+      Five Vánoční spots from five sectors land in the same patch of
+      the map. If you're pitching seasonal creative, decide explicitly:
+      do you want to be in the comfort zone or visibly outside it.
+      Either is fine; landing inside accidentally is not. Same logic
+      applies to any genre cluster (sport, premium-image, family).
 
   - title: >-
       Score dailies, not just the finished cut.
     body: >-
       The same pipeline runs on rough footage in minutes. If the agreed
       brief said "high saturation tension, low brand presence" and the
-      dailies are scoring low/high, you've caught the drift before it's
-      baked into the edit. Cheap insurance on expensive shoots.
+      dailies are scoring low / high, you've caught the drift before it
+      is baked into the edit. Cheap insurance on expensive shoots.
