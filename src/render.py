@@ -31,8 +31,11 @@ import pandas as pd
 import yaml
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from PIL import Image
+from scipy.cluster.hierarchy import leaves_list, linkage
+from scipy.spatial.distance import squareform
 
 from src import config
+from src import metrics as metrics_mod
 
 logger = logging.getLogger(__name__)
 
@@ -342,6 +345,382 @@ def build_gap_svg(campaigns: pd.DataFrame, width: int = 720, row_h: int = 22) ->
     return "".join(parts)
 
 
+# --- Sparkline (per-brand saturation trajectory) --------------------------
+
+
+def build_sparkline_svg(
+    brand_id: str, palettes: pd.DataFrame, width: int = 160, height: int = 32
+) -> str:
+    """Render the per-frame saturation trajectory as a tiny inline SVG.
+
+    Y axis is fixed to [0, 1] so sparklines are visually comparable across
+    brands. A reference dotted line at sat=0.5 anchors the eye.
+    """
+    sub = palettes[palettes["brand_id"] == brand_id]
+    if sub.empty:
+        return ""
+    series = metrics_mod.saturation_trajectory(sub)
+    if not series:
+        return ""
+    n = len(series)
+    pad_x = 1
+    pad_y = 2
+    x_step = (width - 2 * pad_x) / max(n - 1, 1)
+
+    def y_to_px(v: float) -> float:
+        return pad_y + (1 - v) * (height - 2 * pad_y)
+
+    pts = " ".join(
+        f"{pad_x + i * x_step:.1f},{y_to_px(v):.1f}" for i, v in enumerate(series)
+    )
+    mid = y_to_px(0.5)
+    return (
+        f'<svg class="spark" viewBox="0 0 {width} {height}" '
+        f'xmlns="http://www.w3.org/2000/svg" aria-label="saturation trajectory">'
+        f'<line x1="0" y1="{mid:.1f}" x2="{width}" y2="{mid:.1f}" '
+        f'stroke="#D8D2C5" stroke-width="0.6" stroke-dasharray="2 3"/>'
+        f'<polyline points="{pts}" fill="none" stroke="#222" stroke-width="1.2" '
+        f'stroke-linecap="round" stroke-linejoin="round"/>'
+        f"</svg>"
+    )
+
+
+# --- Polar hue radial (per brand small multiple) --------------------------
+
+
+def build_hue_radial_svg(
+    brand_id: str,
+    palettes: pd.DataFrame,
+    anchor_hex: str,
+    size: int = 132,
+    n_bins: int = 24,
+) -> str:
+    """Render a per-brand polar histogram of saturation-weighted hue.
+
+    Each angular bin is drawn as a thin rotated rectangle pointing outward
+    from the centre; the rect height encodes weighted density, the rect
+    fill encodes that bin's hue. Using rect+transform instead of arc-paths
+    cuts per-bin SVG bytes by ~3x and keeps the file under the page-weight
+    budget. The brand's anchor hue is marked as a tick on the rim.
+    """
+    sub = palettes[palettes["brand_id"] == brand_id]
+    if sub.empty:
+        return ""
+    centers, weights = metrics_mod.hue_density(sub, n_bins=n_bins)
+    max_w = max(weights) if weights else 1.0
+    if max_w <= 0:
+        max_w = 1.0
+    cx = cy = size / 2
+    rim_r = size / 2 - 6
+    inner_r = rim_r * 0.2
+    bin_arc = 360.0 / n_bins
+    # Width of each rect = chord at inner_r for the bin arc. Slight overlap
+    # via 1.02 multiplier makes adjacent wedges meet cleanly.
+    rect_w = 2 * inner_r * np.tan(np.deg2rad(bin_arc / 2)) * 1.02
+
+    parts: list[str] = [
+        f'<svg class="radial" viewBox="0 0 {size} {size}" '
+        f'xmlns="http://www.w3.org/2000/svg" aria-label="hue density">'
+        f'<circle cx="{cx}" cy="{cy}" r="{rim_r:.1f}" fill="none" '
+        f'stroke="#E2DDD0" stroke-width="0.6"/>'
+    ]
+    for hue_deg, w in zip(centers, weights, strict=True):
+        if w <= 0:
+            continue
+        # Hue 0° = right in SVG, then counter-clockwise visually (we flip
+        # via -hue_deg in the rotate). The wedge is drawn pointing up at
+        # rotate(0) and then spun to its hue angle.
+        bar_h = (rim_r - inner_r) * (w / max_w)
+        fill = f"hsl({hue_deg:.0f} 72% 55%)"
+        # rotate(-hue_deg) makes hue 0° point right; SVG's rotation centre
+        # defaults to (0,0), so we translate the bar to (cx, cy) first.
+        parts.append(
+            f'<rect x="{-rect_w / 2:.2f}" y="{inner_r:.1f}" '
+            f'width="{rect_w:.2f}" height="{bar_h:.2f}" fill="{fill}" '
+            f'transform="translate({cx},{cy}) rotate({90 - hue_deg:.0f})"/>'
+        )
+    # Anchor tick at the rim
+    anchor_rgb = _hex_to_rgb01(anchor_hex)
+    anchor_hue = _rgb01_to_hue_deg(anchor_rgb)
+    ax = np.deg2rad(anchor_hue)
+    x_in = cx + (rim_r - 4) * np.cos(ax)
+    y_in = cy - (rim_r - 4) * np.sin(ax)
+    x_out = cx + (rim_r + 5) * np.cos(ax)
+    y_out = cy - (rim_r + 5) * np.sin(ax)
+    parts.append(
+        f'<line x1="{x_in:.1f}" y1="{y_in:.1f}" x2="{x_out:.1f}" y2="{y_out:.1f}" '
+        f'stroke="{anchor_hex}" stroke-width="2.4" stroke-linecap="round"/>'
+    )
+    parts.append("</svg>")
+    return "".join(parts)
+
+
+# small local helpers (avoid circular import vs metrics.py for two trivial fns)
+
+
+def _hex_to_rgb01(hex_color: str) -> tuple[float, float, float]:
+    s = hex_color.lstrip("#")
+    return tuple(int(s[i : i + 2], 16) / 255.0 for i in (0, 2, 4))  # type: ignore[return-value]
+
+
+def _rgb01_to_hue_deg(rgb: tuple[float, float, float]) -> float:
+    import colorsys
+
+    h, _s, _v = colorsys.rgb_to_hsv(*rgb)
+    return h * 360.0
+
+
+# --- Bootstrap CI bar chart -----------------------------------------------
+
+
+def build_sector_ci_svg(
+    campaigns: pd.DataFrame,
+    metric: str = "sat_std",
+    width: int = 720,
+    row_h: int = 36,
+    min_n: int = 2,
+) -> str:
+    """Per-sector bootstrap CI on the chosen metric.
+
+    For each sector with >= min_n brands, compute a 95% bootstrap CI on
+    the mean of ``metric`` across the brands in that sector. Render as a
+    Cleveland-style dot-with-bar plot, sorted by point estimate.
+
+    Args:
+        campaigns: campaigns.parquet (one row per brand).
+        metric: column name to summarize (default 'sat_std' for the
+            'saturation tension' story).
+        width: SVG width.
+        row_h: row height per sector.
+        min_n: sectors with fewer brands are excluded (CI undefined).
+    """
+    by_sector = campaigns.groupby("sector")[metric].apply(np.asarray)
+    rows: list[tuple[str, float, float, float, int]] = []
+    for sector, vals in by_sector.items():
+        if len(vals) < min_n:
+            continue
+        m, lo, hi = metrics_mod.bootstrap_mean_ci(vals)
+        rows.append((sector, m, lo, hi, len(vals)))
+    if not rows:
+        return ""
+    rows.sort(key=lambda r: r[1])
+    n = len(rows)
+    label_w = 130
+    plot_l = label_w
+    plot_r = width - 60
+    value_w = plot_r - plot_l
+    height = 28 + row_h * n
+    all_vals = [v for r in rows for v in (r[2], r[3])]
+    lo_lim = min(0, min(all_vals) - 0.01)
+    hi_lim = max(all_vals) + 0.02
+
+    def x_to_px(v: float) -> float:
+        return plot_l + (v - lo_lim) / (hi_lim - lo_lim) * value_w
+
+    parts = [
+        f'<svg class="sector-ci" viewBox="0 0 {width} {height}" '
+        f'xmlns="http://www.w3.org/2000/svg">'
+    ]
+    # Axis ticks: 4 round numbers across the range
+    n_ticks = 4
+    for i in range(n_ticks + 1):
+        v = lo_lim + (hi_lim - lo_lim) * i / n_ticks
+        x = x_to_px(v)
+        parts.append(
+            f'<line x1="{x:.1f}" y1="22" x2="{x:.1f}" y2="{height - 4}" '
+            f'stroke="#EEE" stroke-width="0.5"/>'
+        )
+        parts.append(
+            f'<text x="{x:.1f}" y="16" text-anchor="middle" font-size="10" '
+            f'fill="#777">{v:.2f}</text>'
+        )
+
+    for i, (sector, m, lo, hi, k) in enumerate(rows):
+        y = 32 + i * row_h
+        # Label
+        parts.append(
+            f'<text x="{plot_l - 12}" y="{y + 4:.1f}" text-anchor="end" '
+            f'font-size="12" fill="#222" font-weight="500">{sector}</text>'
+        )
+        parts.append(
+            f'<text x="{plot_l - 12}" y="{y + 17:.1f}" text-anchor="end" '
+            f'font-size="10" fill="#888">n={k} brands</text>'
+        )
+        # CI bar
+        x_lo = x_to_px(lo)
+        x_hi = x_to_px(hi)
+        x_m = x_to_px(m)
+        parts.append(
+            f'<line x1="{x_lo:.1f}" y1="{y}" x2="{x_hi:.1f}" y2="{y}" '
+            f'stroke="#666" stroke-width="1.5"/>'
+        )
+        parts.append(
+            f'<line x1="{x_lo:.1f}" y1="{y - 4}" x2="{x_lo:.1f}" y2="{y + 4}" '
+            f'stroke="#666" stroke-width="1.5"/>'
+        )
+        parts.append(
+            f'<line x1="{x_hi:.1f}" y1="{y - 4}" x2="{x_hi:.1f}" y2="{y + 4}" '
+            f'stroke="#666" stroke-width="1.5"/>'
+        )
+        # Point estimate
+        parts.append(
+            f'<circle cx="{x_m:.1f}" cy="{y}" r="4.5" fill="#181818"/>'
+        )
+        # CI numeric tail
+        parts.append(
+            f'<text x="{x_hi + 8:.1f}" y="{y + 4:.1f}" font-size="10" '
+            f'fill="#555">[{lo:.2f}, {hi:.2f}]</text>'
+        )
+    parts.append("</svg>")
+    return "".join(parts)
+
+
+# --- Brand-similarity dendrogram ------------------------------------------
+
+
+def _dendrogram_layout(
+    z: np.ndarray, n_leaves: int, leaf_order: np.ndarray
+) -> tuple[list[dict[str, float]], list[dict[str, float]]]:
+    """Compute (nodes, edges) for a horizontal dendrogram.
+
+    Args:
+        z: scipy linkage matrix, shape (n-1, 4).
+        n_leaves: number of original observations.
+        leaf_order: list of original-index positions in the leaf order
+            scipy chose for plotting.
+
+    Returns:
+        nodes: list of {idx, x, y} for every cluster (leaves + internal).
+        edges: list of {x1, y1, x2, y2} line segments to render.
+    """
+    # Leaves get y = their index in leaf_order
+    leaf_y: dict[int, float] = {leaf: i for i, leaf in enumerate(leaf_order)}
+    node_x: dict[int, float] = {leaf: 0.0 for leaf in leaf_order}
+    node_y: dict[int, float] = {leaf: float(leaf_y[leaf]) for leaf in leaf_order}
+
+    edges: list[dict[str, float]] = []
+    for i, row in enumerate(z):
+        a, b, dist, _n = int(row[0]), int(row[1]), float(row[2]), int(row[3])
+        merged_idx = n_leaves + i
+        y_a = node_y[a]
+        y_b = node_y[b]
+        x_a = node_x[a]
+        x_b = node_x[b]
+        # The merged node sits at x = dist, y = mean of its children
+        y_m = (y_a + y_b) / 2
+        node_y[merged_idx] = y_m
+        node_x[merged_idx] = dist
+        # Two horizontal lines from children up to merge x, and a vertical
+        # bracket connecting them.
+        edges.append({"x1": x_a, "y1": y_a, "x2": dist, "y2": y_a})
+        edges.append({"x1": x_b, "y1": y_b, "x2": dist, "y2": y_b})
+        edges.append({"x1": dist, "y1": y_a, "x2": dist, "y2": y_b})
+    nodes = [
+        {"idx": float(leaf), "x": 0.0, "y": float(leaf_y[leaf])} for leaf in leaf_order
+    ]
+    return nodes, edges
+
+
+def build_dendrogram_svg(
+    palettes: pd.DataFrame,
+    campaigns: pd.DataFrame,
+    width: int = 760,
+    row_h: int = 30,
+    label_w: int = 170,
+) -> str:
+    """Hierarchical clustering on between-brand energy distance.
+
+    Computes the pairwise Székely energy distance between every pair of
+    brands' weighted LAB palettes, runs UPGMA (average linkage), and
+    renders a horizontal dendrogram. Labels are colored with each brand's
+    anchor swatch dot so the cluster colors carry brand identity.
+    """
+    brand_ids = list(campaigns["brand_id"])
+    n = len(brand_ids)
+    if n < 2:
+        return ""
+    dmat = metrics_mod.brand_distance_matrix(palettes, brand_ids)
+    condensed = squareform(dmat, checks=False)
+    z = linkage(condensed, method="average")
+    leaf_order = leaves_list(z)
+    _nodes, edges = _dendrogram_layout(z, n, leaf_order)
+
+    # x-axis range: 0 to max merge distance. Floor to a small positive
+    # number so degenerate fixtures (all-identical brands) don't divide
+    # by zero in tests.
+    max_d = max(float(z[:, 2].max()), 1e-6)
+    plot_l = label_w
+    plot_r = width - 40
+    plot_w = plot_r - plot_l
+    height = 32 + row_h * n
+
+    def x_to_px(x_val: float) -> float:
+        return plot_l + (x_val / max_d) * plot_w
+
+    def y_to_px(y_val: float) -> float:
+        return 28 + y_val * row_h
+
+    parts = [
+        f'<svg class="dendrogram" viewBox="0 0 {width} {height}" '
+        f'xmlns="http://www.w3.org/2000/svg">'
+    ]
+    # Axis at top
+    parts.append(
+        f'<line x1="{plot_l}" y1="22" x2="{plot_r}" y2="22" '
+        f'stroke="#DDD" stroke-width="0.5"/>'
+    )
+    for k in range(5):
+        v = max_d * k / 4
+        x = x_to_px(v)
+        parts.append(
+            f'<line x1="{x:.1f}" y1="18" x2="{x:.1f}" y2="22" '
+            f'stroke="#888" stroke-width="0.5"/>'
+        )
+        parts.append(
+            f'<text x="{x:.1f}" y="14" text-anchor="middle" font-size="9" '
+            f'fill="#777">{v:.1f}</text>'
+        )
+    parts.append(
+        f'<text x="{(plot_l + plot_r) / 2:.0f}" y="6" text-anchor="middle" '
+        f'font-size="9" fill="#999" letter-spacing="1">'
+        f'ENERGY DISTANCE (LAB)</text>'
+    )
+
+    # Edges
+    for e in edges:
+        parts.append(
+            f'<line x1="{x_to_px(e["x1"]):.1f}" y1="{y_to_px(e["y1"]):.1f}" '
+            f'x2="{x_to_px(e["x2"]):.1f}" y2="{y_to_px(e["y2"]):.1f}" '
+            f'stroke="#222" stroke-width="0.9"/>'
+        )
+
+    # Leaf labels
+    brand_lookup = campaigns.set_index("brand_id")
+    for leaf_idx in leaf_order:
+        bid = brand_ids[leaf_idx]
+        row = brand_lookup.loc[bid]
+        y = y_to_px(float(np.where(leaf_order == leaf_idx)[0][0]))
+        # Swatch dot
+        parts.append(
+            f'<circle cx="{plot_l - 14:.1f}" cy="{y:.1f}" r="4" '
+            f'fill="{row["anchor_hex"]}" stroke="#222" stroke-width="0.3"/>'
+        )
+        # Label (brand name)
+        parts.append(
+            f'<text x="{plot_l - 24:.1f}" y="{y + 3.5:.1f}" text-anchor="end" '
+            f'font-size="11" fill="#181818">{row["brand"]}</text>'
+        )
+        # Sector below
+        parts.append(
+            f'<text x="{plot_l - 24:.1f}" y="{y + 15:.1f}" text-anchor="end" '
+            f'font-size="9" fill="#888" letter-spacing="0.5">'
+            f'{row["sector"].upper()}</text>'
+        )
+
+    parts.append("</svg>")
+    return "".join(parts)
+
+
 # --- Insights --------------------------------------------------------------
 
 
@@ -384,6 +763,10 @@ def build_brand_rows(
                 "arc_shape": c.get("arc_shape", "flat"),
                 "arc_glyph": ARC_GLYPHS.get(c.get("arc_shape", "flat"), "—"),
                 "strip_html": build_strip_png(c["brand_id"], palettes),
+                "sparkline_svg": build_sparkline_svg(c["brand_id"], palettes),
+                "radial_svg": build_hue_radial_svg(
+                    c["brand_id"], palettes, c["anchor_hex"]
+                ),
             }
         )
     return rows
@@ -411,7 +794,9 @@ def render_report(
         repo_url=REPO_URL,
         brand_rows=build_brand_rows(campaigns, palettes),
         scatter_svg=build_scatter_svg(campaigns),
+        sector_ci_svg=build_sector_ci_svg(campaigns, metric="sat_std"),
         gap_svg=build_gap_svg(campaigns),
+        dendrogram_svg=build_dendrogram_svg(palettes, campaigns),
         patterns=patterns,
         playbook=playbook,
     )

@@ -32,6 +32,7 @@
         <div class="brand-meta">
             <p class="name"><span class="swatch" style="background: {{ row.anchor_hex }};"></span>{{ row.brand }}</p>
             <p class="sector">{{ row.sector }} · {{ row.n_frames }} frames · arc {{ row.arc_glyph }} {{ row.arc_shape }}</p>
+            <div class="brand-spark">{{ row.sparkline_svg | safe }}</div>
         </div>
         {{ row.strip_html | safe }}
     </div>
@@ -46,6 +47,11 @@
         {{ scatter_svg | safe }}
         <figcaption class="scatter-cap">Palette diversity (x) vs saturation std across frames (y).</figcaption>
     </figure>
+    <div class="sector-ci-block">
+        <p class="ci-eyebrow">Sector means with 95% bootstrap CI on saturation std</p>
+        {{ sector_ci_svg | safe }}
+        <p class="ci-note">Bootstrap resamples brand-level values within each sector. With two to three brands per sector the intervals are wide; the gap between corporate (banking, automotive) and performative sectors is still visible.</p>
+    </div>
 </section>
 
 <aside class="pull">
@@ -62,7 +68,29 @@
 </section>
 
 <section>
-    <div class="section-label"><span class="num">04</span><h2>Patterns</h2></div>
+    <div class="section-label"><span class="num">04</span><h2>Where each spot's color mass lives</h2></div>
+    <p class="section-intro">A polar histogram per spot. Angle on the wheel is hue (0&deg; red, 120&deg; green, 240&deg; blue); radial length is saturation-weighted density. The tick on the rim marks each brand's anchor hue, in anchor color, so the gap between brand and picture is visible at a glance.</p>
+    <div class="radial-grid">
+{% for row in brand_rows %}
+    <figure class="radial-cell">
+        {{ row.radial_svg | safe }}
+        <figcaption><span class="rc-name">{{ row.brand }}</span><span class="rc-sector">{{ row.sector }}</span></figcaption>
+    </figure>
+{% endfor %}
+    </div>
+</section>
+
+<section>
+    <div class="section-label"><span class="num">05</span><h2>Brand similarity, structurally</h2></div>
+    <p class="section-intro">Hierarchical clustering on the pairwise Sz&eacute;kely energy distance between every pair of brands' weighted LAB palettes (UPGMA linkage). Spots that join low on the x-axis share a color signature, regardless of sector.</p>
+    <figure class="dendrogram-frame">
+        {{ dendrogram_svg | safe }}
+        <figcaption class="scatter-cap">Energy distance is a kernel-based statistical distance; lower means more similar full-palette distributions.</figcaption>
+    </figure>
+</section>
+
+<section>
+    <div class="section-label"><span class="num">06</span><h2>Patterns</h2></div>
     <div class="patterns">
 {% for p in patterns %}
     <article class="pattern">
@@ -78,7 +106,7 @@
 </section>
 
 <section>
-    <div class="section-label"><span class="num">05</span><h2>Playbook</h2></div>
+    <div class="section-label"><span class="num">07</span><h2>Playbook</h2></div>
     <p class="section-intro">Five moves a strategist or creative director can run on next week's pitch.</p>
     <div class="playbook">
 {% for move in playbook %}

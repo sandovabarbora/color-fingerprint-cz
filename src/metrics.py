@@ -237,6 +237,154 @@ def arc_shape(palettes: pd.DataFrame) -> str:
     return "rising" if slope > 0 else "falling"
 
 
+# --- Per-spot trajectories (for sparklines + polar) -----------------------
+
+
+def saturation_trajectory(palettes: pd.DataFrame) -> list[float]:
+    """Per-frame cluster-weighted saturation, ordered by frame_id.
+
+    Returns:
+        A list of saturations in [0, 1], one per frame, in temporal order.
+        Used for sparkline rendering and trajectory analysis.
+    """
+    frame_ids = sorted(palettes["frame_id"].unique())
+    return [
+        frame_saturation(palettes[palettes["frame_id"] == fid]) for fid in frame_ids
+    ]
+
+
+def hue_density(
+    palettes: pd.DataFrame, n_bins: int = 36
+) -> tuple[list[float], list[float]]:
+    """Saturation-weighted hue distribution across all clusters of one brand.
+
+    Args:
+        palettes: All palette rows for one brand.
+        n_bins: Number of hue bins around the wheel (36 = 10° resolution).
+
+    Returns:
+        ``(bin_centers_deg, weights)`` where bin_centers_deg are the bin
+        centers in [0, 360) and weights are the summed cluster_weight *
+        saturation falling into each bin. Both lists have length n_bins.
+        Useful for polar visualization.
+    """
+    rgb = palettes[["rgb_r", "rgb_g", "rgb_b"]].to_numpy() / 255.0
+    hsv = np.array([colorsys.rgb_to_hsv(r, g, b) for r, g, b in rgb])
+    hues_deg = hsv[:, 0] * 360.0
+    sats = hsv[:, 1]
+    weights = palettes["weight"].to_numpy(dtype=np.float64) * sats
+    bin_edges = np.linspace(0, 360, n_bins + 1)
+    counts, _ = np.histogram(hues_deg, bins=bin_edges, weights=weights)
+    centers = ((bin_edges[:-1] + bin_edges[1:]) / 2).tolist()
+    return centers, counts.tolist()
+
+
+# --- Between-brand energy distance + clustering ---------------------------
+
+
+def _aggregate_brand_palette(
+    palettes: pd.DataFrame,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Pool all palette rows for one brand into (centroids, normalized weights).
+
+    Weights are normalized so they sum to 1 across the brand. Returns LAB
+    centroids as Nx3 and weights as length-N.
+    """
+    centroids = palettes[["lab_l", "lab_a", "lab_b"]].to_numpy(dtype=np.float64)
+    weights = palettes["weight"].to_numpy(dtype=np.float64)
+    weights = weights / weights.sum()
+    return centroids, weights
+
+
+def _weighted_pair_energy(
+    a_pts: np.ndarray, a_w: np.ndarray, b_pts: np.ndarray, b_w: np.ndarray
+) -> float:
+    """Sum_{i,j} w_a_i * w_b_j * ||a_i - b_j||_2 — the cross term in
+    Székely's energy distance."""
+    # Broadcasted pairwise distances; shape (len_a, len_b)
+    diff = a_pts[:, None, :] - b_pts[None, :, :]
+    d = np.linalg.norm(diff, axis=-1)
+    return float((a_w[:, None] * b_w[None, :] * d).sum())
+
+
+def brand_energy_distance(
+    palettes_a: pd.DataFrame, palettes_b: pd.DataFrame
+) -> float:
+    """Székely energy distance between two brands' weighted LAB palettes.
+
+    Definition:
+        E^2(A, B) = 2 * E[||X_A - X_B||] - E[||X_A - X_A'||] - E[||X_B - X_B'||]
+
+    where X_A is a random LAB centroid sampled from A's weighted palette.
+    The square-root is returned to keep units in LAB-distance.
+
+    Returns:
+        Distance >= 0. Zero iff the two weighted palettes are identical.
+    """
+    a_pts, a_w = _aggregate_brand_palette(palettes_a)
+    b_pts, b_w = _aggregate_brand_palette(palettes_b)
+    cross = _weighted_pair_energy(a_pts, a_w, b_pts, b_w)
+    self_a = _weighted_pair_energy(a_pts, a_w, a_pts, a_w)
+    self_b = _weighted_pair_energy(b_pts, b_w, b_pts, b_w)
+    e2 = 2 * cross - self_a - self_b
+    return float(np.sqrt(max(e2, 0.0)))
+
+
+def brand_distance_matrix(
+    palettes: pd.DataFrame, brand_ids: list[str]
+) -> np.ndarray:
+    """Pairwise energy-distance matrix across brands.
+
+    Returns:
+        Symmetric NxN array with zeros on the diagonal.
+    """
+    n = len(brand_ids)
+    mat = np.zeros((n, n), dtype=np.float64)
+    palette_by_brand = {bid: palettes[palettes["brand_id"] == bid] for bid in brand_ids}
+    for i in range(n):
+        for j in range(i + 1, n):
+            d = brand_energy_distance(palette_by_brand[brand_ids[i]], palette_by_brand[brand_ids[j]])
+            mat[i, j] = d
+            mat[j, i] = d
+    return mat
+
+
+# --- Bootstrap CIs ---------------------------------------------------------
+
+
+def bootstrap_mean_ci(
+    values: np.ndarray,
+    n_iter: int = 2000,
+    confidence: float = 0.95,
+    random_state: int = config.RANDOM_STATE,
+) -> tuple[float, float, float]:
+    """Percentile bootstrap CI on the mean of ``values``.
+
+    Args:
+        values: 1D array of observations.
+        n_iter: Bootstrap resamples.
+        confidence: Two-sided coverage, default 0.95.
+        random_state: Seed.
+
+    Returns:
+        (point_estimate, ci_low, ci_high). For n <= 1 returns (mean, mean, mean).
+    """
+    values = np.asarray(values, dtype=np.float64)
+    if values.size <= 1:
+        m = float(values.mean()) if values.size == 1 else 0.0
+        return m, m, m
+    rng = np.random.default_rng(random_state)
+    n = values.size
+    means = np.empty(n_iter, dtype=np.float64)
+    for i in range(n_iter):
+        idx = rng.integers(0, n, size=n)
+        means[i] = values[idx].mean()
+    alpha = (1 - confidence) / 2
+    lo = float(np.quantile(means, alpha))
+    hi = float(np.quantile(means, 1 - alpha))
+    return float(values.mean()), lo, hi
+
+
 # --- Aggregation -----------------------------------------------------------
 
 

@@ -79,9 +79,12 @@ make test             # pytest
    - **Brand anchor.** Fraction of total cluster weight whose hue is
      within ±15° of the brand's anchor color (circular hue distance).
 
-5. **Render.** A single static HTML page with inline CSS, no JavaScript, no
-   external assets. Per-brand color strips are base64-inlined PNGs (PIL);
-   the cross-brand scatter is inline SVG. Page weight: ~45 KB.
+5. **Render.** A single static HTML page with inline CSS, no JavaScript.
+   Per-brand color strips are base64-inlined PNGs (PIL); the scatter,
+   hue radials, sector CI plot and dendrogram are inline SVG. Bodoni
+   Moda and Manrope are loaded from Google Fonts. Page weight ~110 KB
+   (the original brief targeted 80 KB; the added analyses earn the
+   extra weight).
 
 ---
 
